@@ -636,6 +636,85 @@ https://github.com/prisma/prisma-binding
 And this is just JavaScript bindings for the Prisma database And it's going to allow us to do things like this where we can connect to a database
 and then we can query things like a user, we can run mutations like a create user, all of the things that we're doing from the playground,
 this is how we're gonna be able to do it in JavaScript. So first thing we're going to do is open that up.
+And we're going to import Prisma from the prisma-binding. 
+    const {Prisma} = require('prisma-binding');
+You may say, 'Hey Wes. Why are we using require on the server whereas on the front end we're using import?' And that's because at the time of recording
+and probably at least for six to twelve more months yet there is no import in Node.js, it's kind of up in the air and
+it's nowhere near production ready. So, on the server we are using require. I know you can use Babel to transpile it 
+or ESM to import it but all that stuff is constantly moving, so we are using the latest standard Node.js and the require.
+So, const Prisma equals require, and then we are going to make our database and we just call a new Prisma from there
+and that will take a couple of things.
+
+        const {Prisma} = require('prisma-binding');
+
+        const db = new Prisma({
+            typeDefs: 'src/generated/prisma.graphql',
+            endpoint: process.env.PRISMA_ENDPOINT,
+            secret: process.env.PRISMA_SECRET,
+            debug: false,
+        });
+
+        module.exports = db;
+
+TypeDefs is one of them, and the type definitions is that generated prisma.graph QL, right? It needs to know what all of the different types,
+queries and mutations are in order to use it. So we have to feed it this Prisma.graph QL file. And that's exactly why we pull it down
+from the Prisma in that post deploy hook is so that we can feed it into this.
+Then we also need to give it access to our Prisma database. And remember, that's in our variables.env file.
+Finally, we need to export this database so that we can pull it into some of our other files. So, say, module.exports is equal to the database.
+
+Next thing that we need to do is we actually need to create the Yoga server. So, I'm gonna create a secondary file in the source.
+We're gonna call it createServer.js. And this is where we're gonna import the GraphQL Yoga server, and if you're wondering
+what GraphQL Yoga is, I know that we explained like why we use it, but GraphQL Yoga is an express server.
+So if you have any other Express middlewares, and we are going to be building some middlewares ourself, you can use all of those, this also sits on top of
+something that's called Apollo server. 
+    https://github.com/prisma/graphql-yoga
+So it's built on top of Express and Apollo server. So, it's not instead of using Express or Apollo server.
+But all of these things would be required in order to get a GraphQL server up and running and GraphQL Yoga sort of packs them all into
+one single package, which is fantastic. So, we're going to import the GraphQL server.
+Then we also need to import what are called our resolvers. And resolvers answer the question, Where does this data come from?
+Or, where does this data or what does this data do in the database? And there's two different kinds of resolvers.
+You have query resolvers, which is when you pull data. And you have mutation resolvers, which is when you push data and put it into it.
+So, we have two separate files. One is called mutation.js, and another one is called query.js and any time we want to expose an API,
+and sort of like expose an end point or make people be able to query users, or query items, or add something to their cart,
+or add an item, or delete an item, we are going to write either a query resolver, when someone wants to pull data,
+or a mutation resolver when somebody wants to push data. 
+
+We have our Prisma server which requires it's own type definitions and schema and everything like that, and then
+we also have our GraphQL server which needs it's own schema and type definitions as well.
+So, we're gonna create another file here in our source, and we're going to call that schema.graphql. And this is going to contain all of our
+queries and resolves, and we are going to be able to share some data between Prisma and Yoga, so we're not duplicating ourselves too, too much.
+... Now, so we've created our database, we've created a function that will spin up a new GraphQL server. We've created our empty schema.graphql.
+A lot of our code is going to do in here in terms of what our client facing types, queries and mutations are going to be.
+And now we actually need to kick start it in our index.js So in the source folder there is an index.js file here.
+We are going to write some code that as, this is going to start up our Node server. So say require. The first thing we want to do is
+make sure that these variables that we put in variables.env,  we wanna make sure that these are available to our application, and this is
+since this is the entry point of our application, this is where we require this variables.env. We're going to require the package dot.env.
+
+We created our database in db.js 
+We made a function called createServer, which will ingest a schema.graphql. And then it will match up everything in the schema
+with either a mutation or a query resolver. We exposed the data base to every single request.
+Again, that will make more sense once we actually hit writing some of these custom resolvers.
+Then, in our index, we spin up a actual version of this GraphQL Yoga server We hold off on the authentication middleware,
+in Express, just for a bit, and then we start it up. So if everything went right, we should be able to,
+Well, let's look at our package.JSON We should be able to run npm run debug or npm run dev
+And let's take a second to unpack all of these server-side, the back end scripts that we have here.
+So, first of all, debug is how we start the actual server. Or start is how you actually start the server.
+I like to use debug locally, and I'll tell you why in just a second. So we're using a package called Nodemon
+and what Nodemon will do is it will monitor your JavaScript files for changes and if there ever is a change in that file
+it will kill the server and restart it so you don't have to manually kill it and restart it yourself every single time that you make a change.
+Normally, with Nodemon, you don't actually need to say what file extensions you want to watch,
+but because we also want to kill the server any time we change a graphql file, we specify that.
+The x is what Nodemon should actually be running. And we're gonna run the command node source.index. 
+So we're basically running Node index.js. And then we also pass at this inspect flag Which is going to allow us to use
+Chrome dev tools to see our console results rather than just seeing them dumped into our terminal.
+And then, other, we have this thing called playground. And what playground will do is it will open up
+either, it will automatically open up that playground that we were looking at before
+or you can also download the desktop application of GraphQL playground and it will open that up for you. So let's go to our back end here.
+    cd backend
+    npm run dev
+    
+
+
 
 
 
