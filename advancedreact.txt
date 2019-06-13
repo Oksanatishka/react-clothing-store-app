@@ -68,7 +68,7 @@ https://github.com/zeit/next.js/
 
 -> Open http://localhost:7777      // you can change the port in the script above.
 -> It's gonna give us a 404 cause we haven't created anything.
--> Create index.js file under pages folder. -> Make a React component.
+-> Create index.js file under pages folder. -> Make a React component. 
     
     import React from 'react';
 
@@ -146,6 +146,8 @@ rcc + tab -> will create class component skeleton
 https://www.atlassian.com/git/tutorials/saving-changes/gitignore
 https://github.com/github/gitignore
 
+
+
 ---------------------------------------------------------------------------------------------------------------
 ------------------------------------- Module 2: CSS and Styled Components -------------------------------------
 ---------------------------------------------------------------------------------------------------------------
@@ -188,7 +190,7 @@ https://github.com/rstacruz/nprogress
 
 ------------------------------------- #9 — Fixing Styled Components Flicker on Server Render (04:18)
 you see a problem when refresh a page - you got a split second of the css not working?
-That's the next litt;e thing that we need to tackle. Style Components by default doesn't work on the server and in order for us
+That's the next little thing that we need to tackle. Style Components by default doesn't work on the server and in order for us
 to render.
 Next.js fixed it with getInitialProps, Custom <Document>.
 
@@ -198,14 +200,444 @@ styled-jsx is included with Next.js by default.
 On https://www.styled-components.com/docs/advanced it's said 'Basically you need to add a custom pages/_document.js (if you don't have one).'
 
 
+
+
 ---------------------------------------------------------------------------------------------------------------
 ------------------------------------- Module 3: Server Side GraphQL ----------------------------------------
 ---------------------------------------------------------------------------------------------------------------
 ------------------------------------- #10 — An intro to GraphQL (14:13)
+What is GraphQL?
+GraphQL is a specification built to implement both a server in GraphQL to serve up data as well as 
+be able to fetch that data from the client.
+    - GraphQL is agnostic to the language (meaning your server can implement GraphQL in any language that it wants,
+    and your front end, or the thing that consumes your GraphQL doesn't even necessarily have to be in the web browser. 
+    It could be an Arduino or it could be a microcontroller or anything that needs to consume the data, could interface
+    with a GraphQL interface).
+    - GraphQL is a SPEC. (So previously what we had for fetching data, we sort of standardized on this, or as far as you can say 
+    standardized on what is called JSON APIs where're fetching data from an API. https://api.github.com/users/wesbos .
+    Every single time that you need to learn an API, you need to learn like, okay, how does this API work? 
+    What tokens do I need to specifically pass this API in order for it to work?
+    Do I need to have it as a get request or a post request. If I'm creating an item, is it a post or a put?
+    If I'm deleting an item, is it a post request or delete request? And it gets a little bit confusing 
+    that you have to relearn how APIs work across every single one. Second of all, when I'm hitting this API for GitHub here,
+    like what if I don't care about any of this stuff? What if I just wanted to get the URL or the type and the name of the person, right?
+    Like all this extra data that's coming across the wire is unnecessary or I get into some points about that in GraphQL.
+    So GraphQL is sorta out there to either replace rest or you can also set up a GraphQL server that sits in front of a rest API that will
+    sort of proxy the data in between it. But at the very basics, we need to understand that GraphQL is a specification that's being put out
+    and you can implement this in any language. We're obviously going to be implementing it on our front end with a library called Apollo,
+    and we're gonna be implementing it on the back end with a library called Prisma and another library called GraphQL Yoga.
+    Now I have opened up here, the API end point for my Prisma server. You don't have to do this, but I've just opened it on up
+    and I've also took off the credentials for it. Again, we'll get into this as well.
+    and I just kinda want to show you a couple core ideas behind GraphQL and how it works. 
+    So first of all, GraphQL is a single end point that you hit and that's very different than with a rest API
+    where you would have many different URLs that you would hit. And if you wanted to grab data from a multiple,
+    you'd have to make multiple requests. With GraphQL what you can do is you just have one end point and you send it your query
+    and then it will return the data and only the data that you have requested. So here I have an empty thing in Playground
+    and I want to query something and I can go ahead and ask for all of the items and on each item I want to ask for maybe the ID
+    of the item and maybe the title of the item, and then when I go ahead and run that,
+            query {
+                items {
+                    id
+                    title
+                    description
+                }
+                users {
+                    name
+                }
+            }
+
+            // The above code will generate the following below:
+            {
+                "data": {
+                    "items": [
+                        {
+                            "id": "ddafge34523gsdgwt52",
+                            "title": "Nudie Jeans",
+                            "description": "asdfgege dbsfdbsd fdb "
+                        },
+                        {
+                            "id": "dd43afge34523gsdgwt521",
+                            "title": "Nudie Jeans 1",
+                            "description": "asdfgege dbsfdbsd fdb 1"
+                        }
+
+                    ]
+                }
+            }
+
+    it's just going to return to me the items along with the ID and the title.
+    So GraphQL is really cool because your queries essentially look like the JSON of the things that you want and then it just returns you
+    the same structure of that data but with the actual values that have been pulled from the database and filled up.
+    That's really cool because I can pull in items, but then if I also wanted to pull in a list of users and their names,
+    I could do that no problem by pulling in items and an array of the actual users that's coming in.
+    See how this is just one end point, one request only pulling in the minimal data that I need to pull in for each one.
+    It's also self-documenting, which is really cool because actually maybe I should talk about how it's typed real quick.
+    https://github.com/wesbos/Advanced-React/blob/master/finished-application/backend/datamodel.graphql
+    and GraphQL is a typed language, and if you're coming from any background that has a typed language or if you use typescript,
+    you probably can skip this part because you understand what that means. But if you are coming from a JavaScript background,
+    you'll know that JavaScript is what is called loosely typed, meaning that you can expect a string or a number
+    or an object or an array and you can return any value, you can call arguments, you can call a function where maybe you
+    are expecting to pass it a number, but you pass it a string, and it's not going to yell at you in any means.
+    However, with GraphQL, when you define your data, you have to specifically define what type of everything is going to be.
+    So like, let's take a look at our items. Our item has a whole bunch of properties in it, like we have an ID and we have a title
+    and a description and created at and an updated at and a price and we go ahead and define 
+    that those things are either their own custom types, which is an ID, or they're just things
+    strings, integers, date types, or you can have relationships to others, like this one, an item is created by a user
+    and then you have a relationship of a user, which in turn will have a whole bunch of
+    other fields, things like an array of permissions or an array of orders or a name or a password or an email address.
+    You sorta get the point that we have it on there. Now, that's really cool because when you make your programming language so strictly typed,
+    you get the benefit of tools being able to analyze your code and provide to you a whole bunch of documentation.
+    So in here, if I'm saying, okay, items I can just hit my control space character on a new line and it will suggest to me
+    what the possible fields are. If this was just a willy nilly JavaScript application,
+    it wouldn't know what the possible returned values are. So I can say, oh, I want to have the description,
+    and then you just run that sucker again and it gives you the description added to that.
+    Similarly, you can click on this little Schema tab in the corner here and it's going to show us all of the different queries and mutations.
+    I'll talk about what mutations are in just a second. It shows me all of the different queries that we have.
+    So I say, okay, like how do I query, what do I have available to me? I can query orders, I can query cart items,
+    I can create different users, I can inquiry either orders, et cetera, et cetera, or I can do the opposite of pulling data,
+    which is I want to push data to the server, I want to update data, I want to create new data.
+    And that is what is referred to as a mutation. So GraphQL really just has two things, queries, pulling data, and mutations, putting data,
+    updating data, creating new data, deleting. Anytime you're actually making a change to the data
+    other than just observing it via a query, that is what is called a mutation.
+    So now that brings me to my next point of a GraphQL is that these queries make writing relationships very, very simple.
+    So let me get rid of the list of users that I was querying, and right here we're just going to query a list of items.
+    And for each item, you can pull back the ID, and see how I just clicked on that and it opened up the documentation.
+    It says like I can query items by, and these are the arguments that it can give it. So if I only wanted the first three or the last three
+    or wanted to skip the first two and show me the second one, we'll get into that when we do pagination.
+    but then it also tells you the type of item has all of these properties on it, which is pretty neat.
+    So I'm going to close that up. And on each of the items we're just gonna, let's just grab the title, see if it works.
+    Good, and then on there it shows me that I can grab the user. So if I were to grab the user and run it,
+    it's gonna give me an error because it says user must have a sub-selection and that's because there's a relationship here.
+    An item is created by a user. So if I want to know who created that item, I just have to grab the user,
+    and then the way that you query properties of the users, is you just give yourself, and remember it's kind of like JSON,
+    but just without the actual values being returned. So I could say the user name and the user ID. Let's see.
+
+            query {
+                items {
+                    title
+                    user {
+                        name
+                        id
+                    }
+                }
+            }
+
+    So the items, here's an array of items.
+
+    GraphQL- The QL stands for query language, but by default GraphQL actually has no, like no filtering, no sorting,
+    they don't have any of the stuff you would assume that you have from like MySQL or something like that.
+    So part of getting over the fact of what is GraphQL is that it itself does not fetch the data and filter the data and provide sorting and all that stuff.
+    GraphQL is simply just a way to vocalize what you want, and then that gets passed to your server and then your server implements
+    these things called resolvers. And resolvers essentially answer the question, how and where do I get this data from?
+    And that's where you end up using your MySQL, or your MongoDB or text-based return of value.
+    That's where you actually handle all of the filtering and sorting and finding of your data.
+
+    So GraphQL by itself is not a replacement for these different database things. It's simply just a way to, a standard to
+    request a specific data.
+
+    So if I go into this where, and the where will give me a number of options, and again, this is part of what Prisma gives us by default.
+    So we want to say like the title is, contains, let's just say Belt. And then for each of those results
+    I want to return the title of it and maybe the description. 
+
+            query {
+                items (where: {
+                    title_contains: "belt"
+                }) {
+                    title
+                    description
+                }
+            }
+
+    GraphQL definitely requires you to rethink how you approach things, especially if you're coming from years and years,
+    like myself, from rest APIs, where you have specific APIs, and in this case we only have one API endpoint
+    and it's all in the queries and the mutations and how we push and pull data to that API.
+    Hopefully that's a nice high-level overview of how GraphQL works.
+    )
+
+
 
 ------------------------------------- #11 — Getting Setup with Prisma (22:55)
+https://www.prisma.io/
+We're gonna start building our GraphQL server that we can interface with our React application.
+We're gonna be using something called Prisma on the back end, and Prisma is a 100% open source library 
+that sort of sits on top of an existing or a brand new database and provides you a full-featured GraphQL API
+that we can use to perform all of our CRUD operations, all of our relationships, all of our data updating,
+everything that we need.
+Remember I was showing you in the last video how I was querying and you can write mutations, and you can relate data to one another?
+I hadn't written any code to get that up and running. Prisma does all of the heavy lifting for you
+to provide you with a full featured GraphQL API. Then we're gonna layer on something called Yoga
+on top of that that will allow us to add our custom logic that is specific to our application.
+However, if you don't care about which database, it doesn't matter at all because we're never actually going to be writing any MySQL,
+Postgres, or MongoDB queries ourself. We're always going to be interfacing with the GraphQL queries that Prisma surfaces for us.
+
+So you can set up your own Prisma instance by using Docker or something like that.
+We are going be using the Demo server from Prisma in the interest of just getting up and running.
+However, do know that you can run your own Prisma, you can run your own MySQL database, and that's likely what you will do
+putting this thing into production. So, first thing we need to do is get you
+actually signed up for Prisma Demo server. So we'll go and click on "Get Started", and you can "open the console".
+It's going to ask you to, or it might not say Open Console, but it might say Sign Up there.
+At the end of the day we just need you to sign up for a Prisma account and log into that thing.
+Then what we'll want to do, when you're logged in you'll probably see nothing here. We want to go over to our terminal and do a little bit of work.
+So, the first thing we need to do is make sure, triple check you're in the back end folder, not the front end folder,
+not just the regular sick-fits folder, the back end folder. Now, inside of that, we're going to globally install Prisma
+'cause Prisma has a command line tool that has some things for sorta bootstrapping our application, and we're gonna be using those.
+So you type, 
+                npm i -g prisma         // i - install, g - global
+Now it's gonna go ahead and install that globally for us.
+Once that has installed, we're going to type,
+                prisma login
+and this is actually kind of a nifty way to log in.
+So you just type prisma login, and it's gonna open up your browser to say Grant Permission, and then you just close the window
+and go back to your terminal and you're authenticated, which I think is pretty cool.
+Then what we want to do is to type 
+                prisma init
+because it's going to sort of follow us through a whole bunch of steps. It's gonna ask us a few questions here.
+1) So, first one, Set up a Prisma, do you want to deploy to an existing server?
+So, you might have an existing database, so if you have a MySQL database or a Postgres database or a MongoDB that you want to connect to, you could do that.
+You could set up a local database using Docker, or you can use either your own hosted endpoint of a Prisma server,
+or you can, in our case, we're going to use the 'Demo server'. So we're going to use our arrow keys to hit enter on that one, then it's gonna ask us,
+2) do we want to put it in the US or the EU. It's kinda cool because it'll show you what the latency is.
+Obviously pick the one that has the least amount of latency for you. I'm gonna use the US since I'm in Canada, nice and close.
+3) Then choose a name for your service, so I'm gonna call mine siccccccccck-fits.
+4) And then you have a stage. So you can have development and production stages, which is kinda neat. I'm gonna leave that at dev.
+5) At this point if you are asked about Prisma Client choose 'Don't Generate'.
+
+// Created 2 new files:                                                                          
+  // prisma.yml           Prisma service definition
+  // datamodel.prisma    GraphQL SDL-based datamodel (foundation for database)      // NOTE: on video it's 'datamodel.graphql'
+
+// Next steps:
+  // 1. Deploy your Prisma service: prisma deploy
+  // 2. Read more about deploying services: http://bit.ly/prisma-deploy-services
+
+P.S. You can see datamodel.prisma instead of a datamodel.graphql. There is no need to make any changes either way.
+
+And there we go, it just created. If I say, 
+        git status
+it's gonna show us that it created just these two files here, and let's actually go ahead and take a look at what those files are.
+
+First let's open this prisma.yml, so open up prisma.yml, and you're going to see there's two pieces of information.
+We're actually going to be modifying this just slightly.  So the first is the actual endpoint that we're going to be hitting,
+and I'm gonna stick that in what's called an environmental variable. And what environmental variables are,
+they allow you to set variables based on the environment. Let's say you have development and then you go to production
+and then maybe you have a staging or maybe you have a different server that you're testing it out on,
+and those things might contain sensitive information or they might just contain values that need to change depending on
+what environment you are sitting in. And it's likely that we'll want to change this endpoint when you switch over to production.
+So what we're gonna do is, we're gonna go to the sidebar here, and you see that we have this 'variables.env.sample'?
+This variables.env file, will, if you open it up, it's going to contain a whole bunch of information, of sensitive information.
+And let me tell you a couple times, do not ever push this variable to anywhere that the public can see.
+So it doesn't go on GitHub, and it doesn't go, and if you look at the gitignore for this file, it'll show you that it's ignoring all .env files.
+But this is just private information that is specific to your deploy and should never be seen by the public.
+So, first thing we want to do is actually rename this from variables.env.sample to just varables.env.
+A lot of people just have it as a .env file.
+And then we want to go ahead and take this endpoint outta here, and stick it into the PRISMA_ENDPOINT.
+And then we'll go back to our prisma.yml file, and we'll interpolate with this syntax, ${env:PRISMA_ENDPOINT (the name of the variable)}.
+Couple other things we want to add to this prisma.yml file. Second, we have this thing called a secret,
+and we will use a Prisma secret, so we'll say PRISMA_SECRET, and what that will do is, it's going to lock down your database
+so that the general public can't just start going and adding and deleting stuff.
+Now, I'm going to make you comment that out for now because what that allows us,
+if you omit the secret then it just makes it wide open, and that makes it really easy for development, but at the huge security concern
+when you actually go to production. So we'll want to uncomment that just before we go to production. So uncomment that.
+We'll go into here and change this secret to something else, 
+Good, and then finally we need something called a post-deploy hook because the way that this is gonna happen is we're gonna modify our data model.
+We're gonna add fields, like things like, we're gonna add the user's email address and the user's password. Those are gonna be fields on the user.
+And then we need to relay that new updated information to our Prisma, which is hosted on the Prisma server.
+So in order to do that, we need to deploy it, and then after the deploy is done, the Prisma server is actually gonna return to us
+what's called a GraphQL schema. So we need what's called a post-deploy hook in there that will pull that schema for us.
+If this seems a little bit confusing, just hold your horses for just a second, we'll fill it out and then we'll go through it together.
+So, our hooks are going to be, and make sure you tab in one level, post-deploy, and then tab in one level, - graphql get-schema -p prisma,
+and that will run it. Let's crack open that other file, which is that data model here. So we have type User, and then that User,
+this is just the default that it gives you. User will have an ID and a name, and obviously we're gonna go and expand this,
+as well as create our new types. But this is the schema of how everything looks.
+So what we want to do now is actually deploy this data model to the Prisma server that is running on prisma.io.
+And normally what you'd do is you go to the command line and you type 
+            prisma deploy
+and that's going to take everything in your prisma.yml file and deploy it, but it's going to actually complain to you.
+Warning, a valid environmental variable to satisfy declaration PRISMA_ENDPOINT could not be found.
+And that's because we are using this alternate naming convention for environmental variables file as variables.env instead of .env.
+And the way you can solve that is just by saying,
+            prisma --help
+and we'll see what all of the Prisma options are. And we want to deploy so I think we can say 'prisma deploy --help'.
+There we go and then it tells us that we can pass a custom path to environmental files, so we can say, 
+            prisma deploy --env-file variables.env
+And that should actually work.
+
+    I have the following in the terminal:
+
+        Warning: Your Prisma server and Prisma CLI are currently out of sync. They should be on the same minor version.
+    
+        Prisma CLI version: prisma/1.34.0 (darwin-x64) node-v8.13.0
+        Prisma server version: 1.32.0-beta
+        
+        For further information, please read: http://bit.ly/prisma-cli-server-sync  // the course video doesn't have warning above
+        
+        Creating stage dev for service siccccck-fits ✔
+        Deploying service `siccccck-fits` to stage `dev` to server `prisma-us1` 458ms
+
+        Changes:
+
+        User (Type)
+        + Created type `User`
+        + Created field `id` of type `ID!`              // the course video has 'GraphQLID!'
+        + Created field `name` of type `String!`        
+        // the course video also has Created field `updatedAt` of type `DateTime!`
+        // the course video also has Created field `createdAt` of type `DateTime!`
+
+        Applying changes 1.3s
+
+        post-deploy:
+        spawnSync graphql ENOENT
+        Running graphql get-schema -p prisma ✖              // the course video doesn't have these 3 rows
+
+        Your Prisma endpoint is live:
+
+        HTTP:  https://us1.prisma.sh/oksana-bibik/siccccck-fits/dev
+        WS:    wss://us1.prisma.sh/oksana-bibik/siccccck-fits/dev
+
+        You can view & edit your data here:
+
+        Prisma Admin: https://us1.prisma.sh/oksana-bibik/siccccck-fits/dev/_admin
+
+        // the course video has this warning:
+        // warning command prepare both exists in plugin /Users/wesbos/Advanced-React/sick-fits/backend/node_modules/graphql-cli-prepare
+        // and is shipped with the graphql-cli
+        // The plugin is being ignored.
+
+
+
+So what's happening here is it's deploying the service to our sick-fits. It says okay, here are the following changes that you made.
+You created a user, you added the field name, and the ID name and then you also added the updated and created fields to that.
+I do get this error right here, "command prepare, blah blah blah". If you get that, it's safe to ignore it.
+I have been in touch with the Prisma folks, and they said that is currently just how it works. It will be removed at a future.
+So even though it's red, it is just a warning, and it's not anything you need to worry about.
+Now, if we go back to our Prisma console here, and you refresh, you should now see your sick-fits service showing up.
+And you might have to go to servers first and select either EU or US. I deployed to US so I'm gonna click on that one.
+And you see, here we go, sick-fits, this is our actual database that we've worked on, and you can use this really handy data browser
+where you can see all of the different values that we have. Let me show you the actual finished one that I have here, where I can go to my data browser.
+I can see that there is users. These are all of the users that we have, all of the different cart items, all of the orders that I have created,
+all the items and all of the order items. So go back to Services. One thing you do need to note is that your requests are limited at 10 per 10 seconds, I believe
+If you do more than that in 10 seconds, then it will just queue them up, and you can queue up to 25 requests. That's not going to be an issue
+when you are in development because you're not gonna be hitting that many. At most we'll be firing off three or four requests per page load,
+and by the time you come back to that, that will have cleared. But, for production, obviously you don't want to be using the Demo server.
+So we've got that up and running.
+One other thing we want to take a look at is, if I take a git status now, you'll see that there's a couple different things that have changed here.
+First, obviously we deleted this variables.env file and renamed it to variables.env. Our Prisma and data model are there,
+but the modified, this is what comes down. Remember when we wrote that post-deploy hook in our prisma.yml file?
+What this does is it goes ahead and gets the schema after we deploy it and we can look at that. It's in the src/generated/prisma.graphql.
+So let's look at prisma.graphql, and this is the magic that is behind all of what Prisma is.
+
+// ??? I don't have this 'modified:   src/generated/prisma.graphql' in the git status.
+
+So it creates this API, and all of the API lives in this prisma.graphql.
+So you can take a look at, we have all our Mutations, createUser, updateUser, deleteUser, upsert, updateManyUsers, deleteManyUsers.
+So we didn't have to create any endpoints or anything to be able to use all of these Mutations.
+As well as, this is one thing that's kinda bugging me right now, the syntax highlighting in VS Code is broken.
+There are two syntax highlighters that you could use to highlight it. One is from Prisma themselves.
+It is brand new at the time of recording. However, it has this problem with the broken one. 
+https://github.com/prisma/vscode-graphql/issues/30 
+The other one is GraphQL for VS Code, https://marketplace.visualstudio.com/items?itemName=kumar-harsh.graphql-for-vscode
+has almost 300,000 installs, and it also has this problem as well.
+This is what comments are in GraphQL is three quotes. So if you are trying to like read this, you can simply just remove it,
+delete the comments, and that's going to actually give you the proper syntax highlighting that we're looking for.
+So what else do we have? We have different queries, if we want to query a bunch of users, if we want to query one user, if we want UserConnection.
+We're gonna be using that with our pagination. This will give us information about how many users are there in total, et cetera, et cetera.
+Everything that you could possibly need. See how large this file is? Just for one data model with two fields,
+it creates a GraphQL API that would have been, what, almost 250 lines of coding?
+And this is going to get into the thousands and thousands of lines of code, as we create more complex data models.
+So, let's actually go ahead and add something. So maybe we'll say we want an email, and the type is going to be a String,
+and with GraphQL, the syntax of it is pretty interesting. First of all, the name for these are called fields. This is a type.
+These are called fields. And then you specify the type of that field. And you can say all the different types are,
+let's just go to the GraphQL documentation https://graphql.org/learn/, take a look at what all the different types are.
+// https://www.howtographql.com/
+So we have fields. We're gonna learn about arguments and fragments and directives and all that good stuff coming through.
+But click through to object types and fields and you can see that the built-in ones are
+integers, floats, strings, booleans, ID, and then in addition to that, Prisma will expose a date/time type for us,
+which is automatically added to the user for tracking both when it was created and when it was last updated.
+Similarly, we can also put an exclamation mark on the end and that will make sure that it is required.
+And if you would like an array of strings instead of just one string, you can simply put some angle brackets around it,
+and that would be an array of strings, where each string is not required, but the array itself is required.
+If you wanted both of them to be required, you could put a bang on each of them. But we're gonna back that up
+and just make it a string that is required. These right here, where you have an @, these are called directives in GraphQL,
+and directives can do anything that you want. And they are implemented by your GraphQL server,
+so if we take a look at the GraphQL directive, you can see that we have @name, you have @unique, which is what we're using here.
+You have @relation for setting relations between values. You have defaults, which is used for obviously setting defaults of the value.
+So we're gonna go through some of them. There are some other ones I haven't used in here which is @rename.
+So once we have added the email, Well, we have to go and re-deploy it again, but remember we typed that really long thing,
+prisma deploy env file variables.env? What I've done, if you open up your package.json,
+you're gonna see that I've created npm script called deploy, which will sorta tuck away all of that hard stuff,
+which is prisma deploy env file variables.env. And we can simply just go here and type:
+        npm run deploy
+What that's gonna do is it, see, it tells you what changes we had. We created a field email with the type of string.
+It also gives you a link to your GraphQL database endpoint, so you can actually click on that.
+And this is going to give us what is called a GraphQL playground, and this is what I was playing around with earlier.
+        https://us1.prisma.sh/oksana-bibik/siccccck-fits/dev
+It allows us to just go into it, so we can look at our schema and see what we have. We have different queries and we have different mutations.
+        
+        query {
+            users (where: {
+                name_contains: "ok"
+            }) {
+                id
+                name
+            }
+        }
+
+        // in a new tab
+        mutation {
+            createUser(data: {
+                name: "Wes Bos"
+                email: "hey@cool.com"
+            }) {
+                name
+                email
+            }
+        }
+
+        // in a new tab
+        query {
+            usersConnection(first:1){
+                pageInfo {
+                    hasNextPage
+                    hasPreviousPage
+                }
+                aggregate {
+                    count
+                }
+            }
+        }
+
+
+So, that is our Prisma setup. It's nice to have this. However, we are not going to be interfacing
+with this directly because you notice that anybody that has this URL is able to just go in and willy nilly start creating stuff,
+as well as when you create a user, we need to hash passwords and all that stuff, and that's where the next video is gonna come in.
+That's where our Yoga server is going to live.
+
+
 
 ------------------------------------- #12 — Getting our GraphQL Yoga Server Running (22:32)
+Now that we have our Prisma database set up we need to work on the GraphQL Yoga side of things. So, Prisma, we give it our data model
+and it's going to create a set of CRUD APIs and if we go to the generated prisma.graphql you'll know that if we'd look at our mutations
+we have all of these create user, update user, delete user, upsert user, and if we look for the query we get users, user connection,
+and all of the ones that we looked at, right? However, we can't use that directly via JavaScript because there is no sort of security layer,
+there's no authentication layer, and most importantly, there is no layer that we can add on custom logic.
+We're simply able to create, read, update, delete and provide relationships between our data and in order to add things, like,
+a customs server site logic, we want to charge credit cards, if we want to send email, if we want to hash any passwords
+before we actually save them to that, if we want to have permissions where different layers of people can do different things.
+There's a whole section of logic that needs to happen, before that data is actually either pulled from or put into the Prisma DB and that's exactly
+what we're using GraphQL Yoga for. So, we're going to go ahead and do that.
+
+The first thing that we wanna do is create a new file inside of our source directory, I want you to create a db.js file.
+And this is where we're actually going to do the connecting to our Prisma DB, right? 
+So our react JS is going to use Apollo Client to query our GraphQL Yoga end point and then on the server, GraphQL Yoga is gonna connect to
+our Prisma database and pull the data back and forth. Similar to how if we were building like an express application you might have like
+a Mongo DB here (on place of Prisma) and your controller(GraphQL Yoga) is going to query your Mongo DB and then return the data to the client.
+So, the db.js is what we're going to connect directly to it and that's going to be using something called prisma-binding
+https://github.com/prisma/prisma-binding
+And this is just JavaScript bindings for the Prisma database And it's going to allow us to do things like this where we can connect to a database
+and then we can query things like a user, we can run mutations like a create user, all of the things that we're doing from the playground,
+this is how we're gonna be able to do it in JavaScript. So first thing we're going to do is open that up.
+
+
 
 ------------------------------------- #13 — Our first Query and Mutation (11:40)
 
