@@ -673,6 +673,9 @@ But all of these things would be required in order to get a GraphQL server up an
 one single package, which is fantastic. So, we're going to import the GraphQL server.
 Then we also need to import what are called our resolvers. And resolvers answer the question, Where does this data come from?
 Or, where does this data or what does this data do in the database? And there's two different kinds of resolvers.
+        resolvers
+            - query resolvers
+            - mutation resolvers
 You have query resolvers, which is when you pull data. And you have mutation resolvers, which is when you push data and put it into it.
 So, we have two separate files. One is called mutation.js, and another one is called query.js and any time we want to expose an API,
 and sort of like expose an end point or make people be able to query users, or query items, or add something to their cart,
@@ -683,12 +686,15 @@ We have our Prisma server which requires it's own type definitions and schema an
 we also have our GraphQL server which needs it's own schema and type definitions as well.
 So, we're gonna create another file here in our source, and we're going to call that schema.graphql. And this is going to contain all of our
 queries and resolves, and we are going to be able to share some data between Prisma and Yoga, so we're not duplicating ourselves too, too much.
-... Now, so we've created our database, we've created a function that will spin up a new GraphQL server. We've created our empty schema.graphql.
+... Now, so 
+    - we've created our database, 
+    - we've created a function that will spin up a new GraphQL server. 
+    - We've created our empty schema.graphql.
 A lot of our code is going to do in here in terms of what our client facing types, queries and mutations are going to be.
 And now we actually need to kick start it in our index.js So in the source folder there is an index.js file here.
 We are going to write some code that as, this is going to start up our Node server. So say require. The first thing we want to do is
 make sure that these variables that we put in variables.env,  we wanna make sure that these are available to our application, and this is
-since this is the entry point of our application, this is where we require this variables.env. We're going to require the package dot.env.
+since this is the entry point of our application, this is where we require this variables.env. We're going to require the package dotenv.
 
 We created our database in db.js 
 We made a function called createServer, which will ingest a schema.graphql. And then it will match up everything in the schema
@@ -714,13 +720,147 @@ or you can also download the desktop application of GraphQL playground and it wi
     npm run dev
     
 
-
-
-
-
 ------------------------------------- #13 — Our first Query and Mutation (11:40)
+So, what I wanna do is open up your backend here and I want you to open up your schema.graphql. You see that how we did these two mutations with hi here.
+I also want to go ahead and start this thing up  (npm run dev). It's gonna tell us it's running on local host port 4444.
+I have the GraphQL Playground app installed, you can also just visit localhost:4444 in the browser, 
+Now, what we wanna do now is go back to our schema and we have hi, and you can tell that this is like the shape of our API.
+Anything that you want to be visible via your API goes in your schema and you can see that by going to your actual URL here, 
+clicking on your schema, and you can see that it tells us. These are the queries we have Well, what we could do is start
+to write our own query and mutations. So, if we go to our query here and let's remove hi, and let's just say dogs.
+But because GraphQL is typed, if you want to return a shape of something, you have to go and make that into its on type.
+Now, well what you need to do whenever you create a new query, is you need to set up a resolver. And a resolver answers the question,
+where does this data come from or how do we get it to the end user? So and to do that we open up our Query.js.
+Now remember that when we created our server here, we line up the schema, which is this with a bunch of mutations
+and queries that resolve to the queries and mutations that we have. So, we're gonna open up our query and we're going to say.
+In here you just have to have a method on every single query that lines up exactly with the different queries that we have.
+So, we're gonna make a dogs one and this is just a shorthand syntax for this, so we can just do that.
+Each time that you have a request coming in, it's going to give you this sort of signature of four different variables. 
+First one is the parent and we'll talk about what that is in just a second but that's just the parent schema
+that we have in GraphQL, then we also get arguments that have been passed to the query. We also get the context, which earlier,
+if we can take a look at our createServer again, you see that the context we've given ourself access to the database.
+That's just a way for us to surface the database. Comebacks will also give us the rest of the request as well. 
+So, if we need any request information about the incoming request whether that's headers, or cookies, or anything that's coming in
+that will be available on the context request. And then finally we get this variable called info. And on info we get a whole bunch of information
+around the GraphQL query that's coming in. All of these variables will make sense as we start to us them, but for now, 
+we're actually just going to be returning. Let's just return an array of dogs, we'll say name Snickers. And we'll give ourselves a name, Sunny.
+Okay, that looks good. Now, if that works properly, we should be able to go back here, you can hit this little button here to refresh your schema
+and then if we go to our schema here. You'll see that our queries is dogs and it will return an array of dogs.
+So, we should be able to here and say query, dogs, and from each dog we wanna return, well we only have a name property in there.
+
+    query getAllDogs {
+        dogs {
+            name
+        }
+    }
+    mutation createADog {
+        createDog(name:"Snickers"){
+            name
+        }
+    }
+
+So what we're gonna do next is we're actually going to be interfacing with the database so that when we kill our server 
+and obviously when people on other computers are visiting our website, they're going to be able to access that data.
+
 
 ------------------------------------- #14 — Items Creation and Prisma Yoga Flow (26:07)
+Alright, in this video we're going to get the items, both the query for polling items, as well as the mutation for creating items.
+We're gonna get that up and running. I found that when I was doing this whole step, you need to edit like three or four different files.
+    - We need to edit our data model, 
+    - we need to deploy it to Prisma, 
+    - we need to edit our schema to GraphQL for Yoga, 
+    - and then we also need to write a resolver; either in the mutation or the query or both.
+
+So, first thing we're gonna do, we're going to open the datamodel.graphql And remember that this is our schema for Prisma
+and then for the database that lives underneath Prisma. And we have our user in here. So we're gonna go down here and
+we're gonna make a new type called Item. 
+        type Item {
+            id: ID! @unique
+            title: String!
+            description: String!
+            image: String
+            largeImage: String
+            price: Int!
+            // createAt: DateTime!
+            // updateAt: DateTime!
+            // user: User!
+        }
+Now any time that you make a change to what your data model looks like, you have to, have to, have to deploy it to Prisma,
+because we need to update the database to know and to expect both of these items. 
+As well, we also need to pull down our new Prisma schema. So we'll go back to our terminal here,
+and I'm just gonna kill this, and we're going to run 'npm run deploy', and that in turn is going to run Prisma deploy
+with our custom and variable environment file. And you can tell it created an item with all of these new fields on here,
+and then it deployed it up, and it ran our post-deploy hook. Then if we go back to our editor here and open up the prisma.graphql file,
+remember that this prisma.graphql file, this is a generated file based on the datamodel, the schema that we give it,
+it goes and it creates a huge GraphQl file that has all of the relationships, and all of the types, and all of the querys, 
+and all the mutations that are required for our underlying crud api that sits on top of GraphQL.
+
+So what we did earleir, in our datamodel we just had 'type Item', but sometimes you're gonna see this in GraphQL:
+'type Item implements Node', this 'implements Node' is very similar to how in react we extend react.component. 
+So you can create a base node, 'Type node', oh they don't even have it in this file, but it's comething that Prisma creates for you.
+And it's just that base where is has an ID, a createdAt, and an updatedAt value for us. However, if we go down to these mutations here,
+you'lls ee that we now have a new set of apis, which is createItem, there we go. CreateItem: they create their own input types.
+Which is ItemCreateInput.
+
+Let's go ahead and write our first mutation. So what are the steps to creating a mutation? Well first we open up the schema.graphql.
+Okay, hold on, why are there so many .graphql files, Wes? Well our datamodel.graphql, that's for Prisma, that's for our backend.
+The prisma.graphql is what gets generated based off this datamodel.graphql. Okay these two things are Prisma.
+Now our schema is just our public facing api, because Prisma has access to absolutely everything,
+whereas our schema.graphql is our public facing api, and that is what we're going to be interfacing with our JavaScript.
+Okay so, we can actually just get rid of type dog. We can get rid of this create dog. We can git rid of that here.
+We're gonna go ahead and make a method called createItem, and that's going to take a whole bunch of different arguments in. 
+
+if it's just the exact same as something that we've generated in our prisma.graphql file, we can import them from that.
+So the way that you do imports in GraphQL currently, it's actually not a standard in GraphQL, there are no imports.
+So Prisma actually uses this thing called GraphQL Import, and it does it via a comment, so this is a little bit weird,
+        # import * from './generated/prisma.graphql'
+And what that's gonna do is it's going to import all of the types and all the inputs from our prisma.graphql, and it's going to make them
+available to us if we then need them. And if we don't use them in our schema it's not going to get imported.
+It will simply just take if from here if we reference it. So by doing that we're able to return a item without actually having the type of item
+to find in this public facing api. However it will then say: Oh, I don't have an item type, I must have to import it from prisma.graphql,
+and then it's gonna go ahead and pull in the value from this generated prisma.graphql.
+
+Let's just double check that it's working. We'll go to here, our localhost:4444. Refresh the schema, open up the schema,
+and you'll see that our queries, (npm run dev)
+
+You Might be saying like, okay like, what is the api for our Prisma database, and our api for our Prisma database
+is everything inside of this prisma.graphql. So a quick way to see what all of the api methods 
+are available to us, is you just search for your mutations, and you can see that we have createUser, createItem, updateUser, updateItem, deleteUser, deleteItem,
+- all of these methods are now available to us on our backend because that's exactly what we're interfacing with.
+So we'll go here, and we will take the ctx.db,  so that is how we access our database. Remember earlier when we did createServer
+and we put the database on ctx, but then how we access the database is that we can access it via ctx.db.
+Another way that we could have done that is that is we could have exported the database and then import it into this file, 
+both ways work just fine, but I kinda like  having access to the database inside of the ctx. Then we call either .query or .mutation,
+so in our case we are going to call .mutation, and then we have access to all of the different arguments that we have, so ours
+is gonna be called createItem, 'cause again you can quickly reference your thing here, 
+...args  - and that's the same thing as manually putting each field and value in. We can spread the argument object directly into our data.
+And the reason why we're not just doing this will become apparent because we're also going to have to come back and assign a user to this as well.
+Now one thing we haven't done just yet is that this ctx.db.mutation.createItem, that actually returns a promise,
+and if we want the item to go into the item value then what we need to do is make this an assync method, and then we simply await the
+creation of the item inside of there, and then finally down here we can simply return the item. 
+Another option that we have instead of awaiting the creation and then returning the item, you can simply return a promise
+and it will work just the same way. I like to put it in a variable and then return the item in most cases,
+and that's because if I'm having trouble debugging it I like to go down here and just console.log
+that item as we create it, and that will give me sort of a spot to be able to do that. 
+
+Go back to the terminal, you can type 
+            prisma console
+and that's gonna open up Prisma backend. You can also just log into it, or you might have it open already.
+
+
+Recap:
+1) when you want to add a new type, you add it to your data model, then we run Prisma deploy to push that up to the Prisma service, 
+that brings down a new copy of our prisma.graphql, which contains all of our queries and our mutations, and all of the possible, different,
+filters that we could use, 
+2) then we go into our own schema.graphql, which again is our public facing api, this is what our react application is going to interface with,
+we can create the ability to create new functions, like create items or query items, then to match up with these mutations and queries,
+3) we go into our mutations and our queries (Mutation.js && Query.js), and we go ahead and write the resolvers to actually complete all the logic that needs to happen,
+and this is exactly where all of our advanced logic, whether it's charging a credit card, or sending an email, all of that is going 
+to be happening in our custom resolvers. So hopefully that makes at least a little bit of sense.
+We're gonna be doing it a couple more times throughout this course, so don't sweat it too much if it doesn't make total sense.
+I found myself that I would need to do it a couple times first.
+
+
 ---------------------------------------------------------------------------------------------------------------
 ------------------------------------- Module 4: Client Side GraphQL ----------------------------------------
 ---------------------------------------------------------------------------------------------------------------
