@@ -865,8 +865,251 @@ I found myself that I would need to do it a couple times first.
 ------------------------------------- Module 4: Client Side GraphQL ----------------------------------------
 ---------------------------------------------------------------------------------------------------------------
 ------------------------------------- #15 — Setting Up Apollo Client with React (11:24)
+Now anytime you're working with data in a React application you're generally doing one of two things,
+    
+    - you either store all of your data in a component via state, and then if you want that state to be accessible
+    to other components, you either use regular state, and if you want that data state to be available
+    to other components, you either put it in a context or pass it down via probs, or as that starts to get
+    a little bit unruly, you usually reach for something called Redux and Redux is a data store
+    where you can define what your actions are and how those actions are handled and how the data goes in and out and whatnot,
+    
+    - and Apollo Client will replace the need for using something like Redux in fact Redux was used under the hood
+    in Apollo for version one, now it's in version two and almost version three. So we don't need to use Redux in here
+    because Apollo does all of the data manager stuff that a Redux store will do, as well as a whole bunch of other stuff.
+    So it will do 
+            - the fetching of the data from the serverside, 
+            - the pushing of the data to your mutations
+            - all the caching so if I request a resource twice in the same page, or request it once and then 10 minutes later request the same resource it's going to pull it from the cache first.
+            You don't have to worry about whether you should pull that over the network or not, it will help us manage our local states, so if you have data that just stores
+            in the browser we can do that. And it also gives you your error in loading UI states which is fantastic, you never have to set a flag
+            of is loading true or you never have to manually catch your errors because it will do all of that for you.
+    So Apollo does a whole bunch of stuff for you and it's really awesome, it's sort of the gold standard for working with GraphQL in React world.
+    There is another package from Facebook that is called Relay and I'll let you do your own research into that.
+    It's a little bit more low level, whereas Apollo Client is up and running really, really quickly but that's not to say that Apollo Client is less powerful.
+    I have yet to run into any huge show-stopper issues with Apollo Client so, really excited about it.
+
+First thing we want to do is open up this withData.js.
+
+    1) First thing we need to do is import the Apollo Client from something called apollo-boost. What apollo-boost is is a package
+    that is put out by Apollo, it's an official package that has all of the standard things that you would want to use with
+    an Apollo installation in the client included. By default Apollo Client just comes as Apollo Client,
+    https://github.com/apollographql/apollo-client/tree/master/packages/apollo-boost 
+    and then if you want to add anything to maybe deal with caching or to deal with Ajax calls to your serverside, or to handle errors
+    or to do local state management then you have to use all of what are called links and you can sort of like extend what Apollo Client does.
+    However in most cases most people will want to use all of these things so they put out this package called Apollo Boost 
+    and it has these things pre-configured for you which is fantastic.
+
+    2) Next thing we need is withApollo from this package called next-with-apollo what that does is it's going to give us
+    a high-order component that will expose our Apollo Client, Apollo Client is the data base that is in the client,
+    and it will expose that client via a prop. ReactApollo actually comes with some tools for doing this
+    however because we are using next.JS and we want serverside rendering to work, there's a little bit of extra work that we need to do
+    because of how serverside rendering works. This package does all of that for us which is great, and then 
+    
+    3) I've just imported the endpoint from our config.JS which just shows us where our actual API is being,
+    this is our Yoga API right here, 4444. 
+
+    4) Then what we do is we create a function that takes in some headers and that's going to be very important
+    when we get into our authentication stop and we return a new client from it and then we give it the url of our end-point.
+    In this case I'm always just giving it that local host 4444 but we could change that out when we go to production
+    and then what we do here is on every single request that happens this is sort of like an express middleware here.
+    We are including our credentials. Again what that's going to do is that when you make a request if we have any logged in cookies in the browser
+    then those cookies are gonna come along for the ride and that's important when we flip over to our back end. 
+
+    5) Finally we export this with Apollo we give it a function to create a client and then we're gonna actually create a client 
+    in our app.JS so let's jump over to there. We're gonna do all of that ourselves.
+
+_app.js
+    1) We want to import the ApolloProvider from the react-apollo package. And then we also want to import the withData method
+    that we just made from go up a level, into the lib folder and into the withData. 
+    Then all you need to do in order to expose a Apollo Client to a React application is just wrap the application
+    in what's called an Apollo Provider. I'm gonna go in-between container and page. Page is like the highest level that we have.
+    So what we're gonna do is we're gonna wrap each and every page in that and we'll say ApolloProivder.
+    Wrap that there and then the Apollo Provider needs a client which is our Apollo Client accessible to it.
+    Let's say client is equal to and that is available via this.props.apollo and why is that available to us?
+    Well because we're gonna go down here to when we export it, remember I said that this with data is gonna be a high-order component.
+    What we're gonna do is we're gonna export this app and we're gonna wrap it in our withData function 
+    and that's going to make the Apollo Client accessible via this.props. What I like to also do is not to type this.props
+    out of Apollo but we can destructure it up here. So let's say, component, Apollo. Then we also need to do a little bit of work
+    in order to expose page numbers. When we go to different pages on our application we are going to need to surface those page values
+    so anytime I go to like /item you see page two. (e.g. localhost:8888/items?page=1)
+    Or /itemsingular, id equals one, two, three. We need to surface those values. In previous versions of Next.js
+    they would automatically do this but now we have to explicitly do that so what we have to do is go up here
+    and write ourselves a static getInitialProps which is going to pass us the component and the context 
+    say let pageProps is equal to curly bracket and then we'll say if the component that we're trying to render has some props
+    then we are going to surface those via the page props. So pageProps is equal to await, Component.getInitialProps.
+    And you pass it the context and what we need to do is mark this as async, and finally what we'll do here is we'll say pageProps.query
+    is equal to ctx.query that is how we, let's write a little comment there. This exposes the query to the user.
+    Then we'll return pageProps. 
+    Then down here what we'll do is we'll destructure that, pageProps. You may be thinking how did I just go from pageProps here to here,
+    that's because this getInitialProps that's a special next.JS lifecycle method. This will run first before the first render actually happens.
+    And by returning anything here you expose it via Props down here and that's gonna be really important because what this all does in here
+    where we say Component.getInitialProps is every single page that we have it's going to crawl the entire page for any queries or mutations
+    that we have inside of that page that need to be fetched. We have a list of items and a shopping cart and a couple other queries on the page.
+    All of those queries need to be fired off and resolved before we can actually go ahead and render out the page.
+    By doing this right here, it's going to crawl all of those pages for us, fetch all that data and then return all of that data to this.
+    It's a little bit confusing to me but this isn't necessary if you're just doing a client rendered app, it's just because of the way that
+    serverside rendered applications work. Where does all of this code come from? If you go to the next JS or the Apollo documentation
+    they all have examples of how to get it working with server-side render and there's lots of examples that look a lot like this. 
+    So we have these page props, we're going to go into the component down here and we're just going to spread those
+    on down to the component for that specific page. Now, if that works let's actually fire up our client, so I'm gonna go over here, 
+            npm run dev
+    and it seems like everything's working. Open Console - everything's working too.
+    One thing I do recommend getting is the Apollo dev tools for either Firefox or Chrome so just do a quick search
+    for Apollo dev tools and what that's going to do is it's actually gonna give us access to our entire store or the cache as we say it,
+    there's nothing in here yet but if I were to go to this one, and open up my Apollo cache here, you can see that I have got my cart items in here,
+    I've got all of the different items, I have all the different orders that I have and the specific user as to who I am right now.
+    You can see all of the different permissions and orders and name and id and the e-mail that I have. This is kind of like React dev tools
+    where it's going to allow us to peer into what the cache actually looks like right now, in case we're running into any caching issues.
+    https://chrome.google.com/webstore/detail/apollo-client-developer-t/jdkknkkbebbapilgoeccciglkfbmbnfm?hl=en-US
+
+    So that is a little bit of boiler plate that we need to get this Apollo up and running.In the next videos we're actually gonna be writing some code
+    that we can fire off some queries and start pulling data into our application so we can template it out with React.
+
+
 
 ------------------------------------- #16 — React Meets GraphQL (25:54)
+All right, now we're going to get into the React side of things where we're gonna be writing queries to both pull down a list of items, to update items,
+to add new items, to delete items, we're gonna do the whole crud of our items, and then we'll sort of go back and forth 
+and do that throughout the rest of the course  with orders and cart and buying things and charging credit cards and sending email
+and all that good stuff. So let's get up and running. Just to show you real quick, the homepage is going to be the list
+of the four most recent items, and then when you click on shop it's gonna bring us to /items, and it's also going to be,
+so these are gonna be the exact same page, and then as we go through to page two, it's gonna be the items page with a query param of page two
+being passed over there. 
+
+So, actually what we wanna do is open up index.js, which is the homepage. And we wanna go into our pages folder
+and we're going to make a new file called items.js as well. And all we're going to do is import Home from index. And then export default Home.
+So the way that we can reuse the same page from multiple pages is simply just to import that and then export it immediately.
+And if we go to our application now and we go to items. Actually, what did we call it here? We called it shop. Let's change that real quick.
+We'll go to nav.js, and let's call that shop.
+Now what we're gonna do here on our index.js, we can actually remove this link tag here. We're going to create a component that's called item.
+So go into your components folder, make a new file called the Items.js. Gonna scaffold out a component rcc tab, there we go.
+And we create a component called items. Now we are importing React and the component. We also need to import query from React Apollo,
+'cause that's what's going to allow us to actually query data directly into this component, and then let's just give ourselves a div inside of that,
+just paragraph, say items. 
+Now we'll go back into our index.js and import that items. 
+We can double check in our React dev tools that our items is there, beautiful. That's our component.
+
+Now most of our work is going to be done in the items.js. I can close down any other files that we have.
+All right, so first thing we wanna do is let's just get some data on the page and learn how to actually query some stuff
+from our Apollo store before we can get into styling and looping over and what not. 
+The first thing that we need to do is write a query. And the way that you can write a query in this is by using the GraphQL tag.
+So we will import gql from GraphQL tag. And then we are going to make a query. Now there's a couple options that we have here.
+Some people like to put their queries in a separate file and leave them in a queries file and then import them into that file as you need it,
+or what I like to do, and this is what comes recommended from the Apollo devs, is that just locate the queries in the actual files where you're going
+to be doing the querying, and then if you need to access that query in multiple files then you can just export it from one of those
+and import it into the rest. So, that's exactly what we're gonna be doing. I'm a big fan of just putting everything in the same file
+until it becomes a problem and then refactoring it out. So say const ALL_ITEMS_QUERY, and it's sort of a best practice
+to put all of your queries in caps. And we say = gql back text. So this works the exact same way that style components works
+is that we write our queries in a string and then you just tag it with a gql. So make sure that you use back ticks here.
+And then in here we just write the query. We are going to name all of our queries, and what I like to do is name them the same thing
+as the actual variable that it lives in, just for your own sanity's sake, because then you're gonna be having query variables, 
+you're gonna be having names of queries, and then you're also going to have the name of the query or the mutation that's on the client side,
+and it can get out of hand real quick. So we're going to call it ALL_ITEMS_QUERY, and then inside of that we simply just start
+to write the query as if we were doing it in the playground. So we're gonna say we want the items and for all of the items we want to pull the ID,
+the title, the price, the description, the image, and the large image. So we have listed out all of the fields that we want to return.
+Remember with GraphQL you only pull in exactly what you need. If there's anything in that item that you don't necessarily want,
+you leave it off your actual query. Now the way that we use this query is via something called a Render Prop. We previously had imported this query,
+and that's actually a component in itself. So previously in versions of React Apollo, or you may have used other libraries, 
+they use what's called a high-order component where when you export this item, maybe you would take that off, and you'd say export default Items.
+Then what would happen is you would make a function that was called like withItems, and then you would wrap your component
+with this high-order component, and then that would expose a list of items via a prop. 
+And then if you had multiple you could compose multiple. That's how redux works. However, what's becoming more popular now
+in the React world is something called a Render Prop where you don't have to mess with high-order components,
+you simply just put a component inside of here that is a query and then the child of that component is going to be a function that gives you
+either loading state, an error, or the actual list of items itself. Now, this can get a little bit hairy with all of the curly brackets and what not,
+so stick with me and we'll show you one quick example. I find that most people's initial reaction to Render Props are that they don't like it.
+But I do find that after a while I start to like it, or maybe I'm just drinking the Kool-Aid. So this is the recommended way to do it via Apollo.
+Apollo does also have a high-order component. But at the time of recording, they are really pushing the Render Prop
+as well as you don't get the error and loading states with mutations on high-order components. That's another reason to go Render Prop.
+So we're gonna go down here, and we are going to give ourselves a query component. Then the query component takes a query prop itself,
+and then you pass it the, you pass it the name of your query. So our's is called ALL_ITEMS_QUERY, then inside of your actual query,
+you don't just go ahead and start like giving yourself a paragraph tag or something like that. You must, the only child of a query component,
+must be a function. So the way that we do that in React, and this is where it starts to get a little bit hairy, is you give yourselves a set
+of curly brackets to note to React that. Okay, now I'm switching from JSX land over to JavaScript land. And then inside of that we write a function
+where it gives us a number, like what's called a payload. So we give it an arrow function. Let's just do that right now. 
+And then that arrow function gives us a payload. And then inside of here we can go ahead and let's just console.log the payload,
+and then from this we need to return some sort of JSX that will be rendered as the child. So return a paragraph that says,
+hey, I'm the child of query. Give that a save. You see how my, oh I got an error but, you see how it took off the,
+I had the parentheses here and then as I save it that's just my prettier saying, okay, if you only have one argument of an arrow function,
+it's not necessary. If there was two things, like another one, it would not actually remove those, but that's just a prettier setting that I have
+that will automatically format them. So we got a little bit of an error here, what have we got here? Check the render method of items.
+Element type is invalid. Expected a string for built-in components or a class function for composite components but got undefined.
+Okay, so let's take a look here. So I just stopped for a second to try to debug what was going on and it turned out that I just had to refresh the page.
+Sometimes the hot reloading can get into a weird spot where it catches an error and is not able to recover itself. 
+So if you ever do get into one of these errors just give your page a refresh and see if that's what it is first. So here we have query.
+We're running it, we should now see in the console a payload, ho ho, there we go. This is our payload and what's inside of it?
+Well there's tons of stuff inside of here. There is some methods for refetching that query. There's some methods for polling
+where you could poll it every however many seconds and kind of get like semi-real time data. 
+Apollo also has the ability to do real-time data as well. You get access to the client. This is the actual Apollo client itself.
+That's where all the data is stored. But the things that we are interested in here is three things, data that contains an array
+is three things, data that contains an array of the return data from our query. In our case we just asked for items. 
+So it's returning just those items. And you can see that the two of our items are in there. That's good.
+Error undefined, so if something went wrong here, then it would actually return us an error, and then the loading is going to be either true or false,
+and what that will do is this little Boolean will flip to true when it is doing some sort of work, and in most cases this is always going to be false
+because we are server side rendering, so it's gonna wait until that is flipped over to true, but we will be using that quite a bit on the client side.
+So that's what we have here. We have this payload and what is fairly common to do is instead of saying like payload.error, payload.data,
+payload.loading, what we do is you can destructure the values that you want out of payload into their own variables immediately.
+So what we do is first put some parentheses around payload, and then second we are going to destructure payload into data, error, and loading.
+And this is why people don't necessarily like using Render Props because what this does is it gives you a lot of curly brackets here and there.
+I have this like rainbow curly bracket extension turn on in VS code where I have them as different colors. You might wanna turn that on.
+I'm not sure if I totally love it just yet. But if you have a problem with lots of curly brackets it's worth stopping and just peeling back the layers
+of what each of the curly brackets do. So now what we can do is change this out. Data, and here we could say return this,
+I found {data.items.length} items. Now what we need to do here is, generally what I'll do is I'll say if loading returned
+paragraph loading... If error returned error otherwise we return the data. And it's really important to first check for loading
+or checking for error in your components before you actually go ahead and assume that the data is there,
+because if you do this before, you might not have items, you might not have data and you might not have items 
+and then it's going to tell you cannot read property items of undefined or cannot read property length of undefined,
+and you're gonna get into some weird issues. So always check if you're in the loading or the error state.
+So always check if you're in the loading or the error state. We're also gonna get into situations where we do still want to render this out
+as well as show the error message. Let's scaffold this out and get some stuff showing up on the page.
+First thing we wanna do is center all this and this made me laugh when I was working on it, 'cause we're gonna write some styled components.
+So we'll say import styled from styled-components, and I'm gonna make a center tag like it's 1991. So const Center is equal to styled.div.
+And I'm just going to put a text line center on there and I'm gonna swap out this div here with a center tag.
+And that should center it, good. We're gonna make an items list component. So const ItemsList is equal to styled.div.
+And we'll display grid.. And here, remember if we look at our page.js, you remember that we had the max-width in here from the theme.
+So we're simply going to pull that via props. So we interpolate a little function here, and then we access props.theme.max.
+Then we take this ItemsList here. We're just gonna remove this here. We're gonna return an ItemsList and then inside of that we're
+going to have each of our items. So we can take our data, just data.items.map, and for each item were just gonna map over it.
+We're gonna loop over and remember this is how you loop over items in React. You take an array of things and you map over it,
+and for each item in the array, we're going to return something else. So let's just say, let's just do a paragraph tag for now,
+and we'll interpolate the item.title. We've got our items showing up. Doesn't look like they're beside each other.
+
+So go under component, so create a new file called Item.js, and we will say rccp. What that does is it imports React
+as well as a prop-types package, and on that we are going to say the one prop type that we are expecting is called item.
+We are going to say PropTypes.object.isRequired. You can go a little bit further with that instead of using object because it could be any object.
+You could shape that object by saying PropTypes.shape. And inside of that you could say it needs a title,
+which is a PropTypes.string.isRequired, and you can duplicate that and change that to price, and that could be a number. And you get the point.
+Or you could shape out the entire item. I'm not going to spend a whole lot of time on PropTypes paths just putting them in here in this course
+just because this is an advanced course. You should know all about PropTypes and how to use them. You don't want to see me doing typing
+for 20 hours worth of typing. So I'm gonna bring that back to just a regular old object. We need a couple more imports up here.
+We need a title. These are a couple styles that we need to import the ItemStyles and the PriceTag. And we're gonna import those all.
+Say import from styles/ the name of the actual file. Then we'll go down inside of our render here.
+Before we return it we'll say const item = this.props.item. Or we could just go ahead and destructure this.props like that. 
+Good, and then we will, from this, we will return itemStyles. And inside of that we give ourselves a title tag.
+
+{{}}
+The reason being is that in JSX if you want to pass reference to something, like you had a variable, you'd just say item,
+but if you actually just want to be an object literal, the first set is telling it you wanna pass reference to something 
+or you are using JavaScript. And the second set is the actual object literal. Inside of that we say pathname, all lowercase,
+is going to be /item. That's the URL that when someone clicks on that, that's where they're gonna go, and then the query that comes along with that,
+like the URL, the question mark, whatever, is going to be the ID. It's item.id.
+
+Next.js does not have the ability to do what's called pretty URLs. So we couldn't do item/shoes. There are some external packages,
+there's three or four of 'em that will do that for you, but that requires you to get into custom servers, 
+and I do believe they will add that at some point, so I'm not gonna get into custom packages. I'm gonna keep it strict Next.js right now,
+and you can always investigate those packages yourself. 
+ 
+
+
+
+
+
+
+
+
+
+
+
 
 ------------------------------------- #17 — Creating Items with Mutations (29:50)
 

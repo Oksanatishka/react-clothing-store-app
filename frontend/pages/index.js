@@ -1,4 +1,5 @@
-import Link from 'next/link';
+import Items from '../components/Items';
+// import Link from 'next/link';
 // import React from 'react';   // next js will take care of it
 
 // !! Class component
@@ -12,7 +13,8 @@ import Link from 'next/link';
 // !! stateless Functional component
 const Home = props => (
     <div>
-        <p>Hello World!</p>
+        {/* <p>Hello World!</p> */}
+        <Items />
     </div>
 );
 
