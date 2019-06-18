@@ -1,5 +1,6 @@
 Resourses:
 https://advancedreact.com/
+Subtitles: https://github.com/wesbos/Wes-Bos-Captions/blob/master/ARG/17%20-%20Creating%20Items%20with%20Mutations.vtt
 
 Module 1: Introduction and Setup
 Module 2: CSS and Styled Components
@@ -1101,29 +1102,897 @@ and you can always investigate those packages yourself.
  
 
 
-
-
-
-
-
-
-
-
-
-
 ------------------------------------- #17 — Creating Items with Mutations (29:50)
+All right, we are going to be doing the C part of CRUD, which is we're actually going to be creating an item, and then we're going to be doing
+that via the sell page, where we have a little form here that takes in a title, a price, as well as a description 
+for the item, and then you can also go ahead and upload an image. We're gonna hold on the image part until the next video
+and that's where we're going to learn how to interface with external upload APIs. Specifically, we're going to be
+using one called Cloudinary. So, open up your sell.js file and then also open up-- 
+Or actually, we have to create this ourselves. Go into your components folder and make a capital C, capital I, CreateItem.js and we will scaffold
+out a little react component there-- RRC, oh, that's for redux. RCC. I also like to export them at the bottom.
+We also need a couple more things to import here. We're gonna import the mutation component from react-apollo.
+That's going to allow us to actually push data. Remember query mutation. Query is when you pull data, mutation is when you push
+and actually make it change. We are also going to import the form tag from our styles. We are also going to import the form tag from our styles.
+So, import form from styles/Form, capital F Form. We need that formatMoney function that we've used before
+and we also need GraphQL, GQL. So, input gql from graphql-tag. And we got couple more things we want to import
+But let's pump the brakes on importing things until we actually need it so we can actually understand what they do.
+So first thing: let's just render out a form tag, capital F Form, and inside of that, give yourself an H2 that says sell an item.
+
+Okay next, what we want to do is I actually want a fieldset and I'll explain why I want a fieldset in just a quick second.
+And then, inside of that we need a bunch of inputs. Let's take a look at here. So, first one is for title.
+I'm going to have it label and I'm going to call that title. So we use htmlFor in React instead of regular for,
+just because for is a reserved word in JavaScript. So they use htmlFor, so that's for title. Then I'm going to do my title, there.
+And then we want to input type of text, id of title and name of title, placeholder of title, a required attribute. 
+Now, let's talk about where the data is going to come from.
+This CreateItem is going to have a local state inside of it. And this is kind of cool because you might think,
+"Oh we're using Apollo, we have no need for state." But state is really helpful for when you want to just contain data locally within a component.
+And before we actually send all the data to our GraphQL API, we need to store it somewhere, right?
+So we're going to be temporarily storing that in state. So we're actually gonna go up here, State is equal to, and our state is going to have
+a default state of the following values: title nothing, description nothing, image, large image, all those empty strings, and then price is going
+to be zero, which is an empty number. Then what we can do here is we can say the value is bound to state, so this.state.title.
+
+You'll see the warning in Console:  "Warning: Failed prop type: You provided a `value` prop to a form field without an `onChange` handler. This will render a read-only field. If the field should be mutable use `defaultValue`. Otherwise, set either `onChange` or `readOnly`."
+
+So, the idea behind these inputs with React is that if you ever tie something that is changeable in the dom to state,
+then you're in a little bit of hot water because now there's two places where that data lives. That data lives in your text area, as well as in state,
+and the whole idea with react is that you always want a single source of truth, and you always want your data to live in one spot.
+So, the way that you handle that, when it actually changes, is kind of a bit of a roundabout where you listen
+for the change event on this input, you intercept that event, you grab the value that the user had hoped they 
+had typed, and then you set that to state, which will then actually make the input change. It's just this whole roundabout way.
+So, let's do an onChange handler for this input here. So let's say OnChange is equal to and we'll just say this.handleChange and then we'll go up here
+.. and we'll make a method handleChange. The reason why we make that an arrow function is that because--
+This is what is called an instance property 
+        handleChange = () => {
+        
+        }
+and inside of this, we're going to be able to access this, which is important 'cause we need to call this.setState, right?
+If this was a regular method, ES6 classes do not bind regular methods to the instance of the property. 
+And then if you've taken my React for Beginners course, you know you have to do this terrible thing
+where you have your constructor and you call super and then you say this.handleChange = this.handleChange.bind(this)
+and that's a bit of a mess.
+        constructor() {
+            super();
+            this.handleChange = this.handleChange.bind(this);
+        }
+But what that does is where you do have access to this, you overwrite the handleChange function
+and you bind it to that instance of this. So, nightmare situation. So, the way that we can get around that is with instance properties.
+Indent setting it to an arrow function and that will then we able to access this and all of the other things that we need.
+So, handleChange will give us an event. And let's just actually console.log the event and see what we're working with here.
+So, open up your dev tools. 
+
+See, I'm gonna type the letter 'x' or any time I type a letter, we get the event and inside of that event is a number of things 
+but the target is actually what we're looking for. So, let's e.target, that's the input, .value. So, cool shoesx. See, it's 
+telling us what we wish we had typed, cool shoesx, but then React automatically backspaces it and goes, "Uh-uh-uh, not allowed," 
+because then you have your state in two places. So, what we need to do is we say this.setState and we'll say the title is going 
+to be e.target.value. And then you type in an 'x' and that allows us to actually type into here. And if we were to inspect that 
+component here, and we find our CreateItem, you see that the title state is being updated as I type. Now, we can make this handleChange 
+function a little bit more resilient and it can be reused for all of the different inputs that we have on that specific page. 
+So, first thing we want to do is we want to get the name, the type, and the value. So, say const {name, type, value} = e.target and 
+what that's going to do is it's going to give us access to the input's name, the input's type, and the input's value And we can just 
+go ahead and console.log all three of those. It's a little trick I like to do instead of just console logging name, type, value. Here, 
+let me show you what that looks like. The name of title, the type of text, so the name, which comes from here, the type, which is text, 
+and then the value is whatever someone had typed into that box. But what I like to do is to wrap it in curly brackets and then it 
+actually gives you some keys for it so you know exactly what you're looking at. That's just using ES6. It's the same thing as saying 
+name: name, type: type, value: value. So, that's good. We have those values there. Then what we need to do is say const val is equal to, 
+and if this is a number, we need to make sure that it is a proper number because any text that comes out of an input, even if it's a 
+type of number, it will still come out as a string and we need to coerce that into a proper number. So, we'll say if the 
+type === number ? parseFloat(value) : value. Otherwise, we're just going to return the regular value. So, we have this new variable 
+called val. Gotta get that out of there, I accidentally typed that. And then we can modify this.setState to be not e.target.value
+but just with val. Let's see if it's still working. Still works great. However, we don't want to make this function just work for the 
+title input, we want to make it work for any input. So, what we can use is computed property names where we can set the name of it 
+and that's going to be title, price, description, file, any input that we have, and then it will mirror that change to state. So, 
+let's see if it still works. Very nicely. Now, that means that we should be able to take this one label that we have here, paste it, 
+change this over to price, change the input type to a number, call Price, and I should be able to-- There we go. Use these inputs or 
+actually paste a regular number in there and then the values in my React state are looking good. That's a bit of an expensive thing to 
+buy. There we go. You can see that there's no quotes around it because we're doing that little check. So, I love this little handleChange 
+event handler that I have because it's just a couple lines of code and it allows you to mirror multiple inputs to your state so that 
+if you were adding more inputs in the future, there's no extra handlers that you would have to create. So, let's do the last one for 
+the description. (imitates trumpet) Label for description and-- Oh, this shouldn't be title, this should be price, description. 
+This is going to be a text area and normally in HTML, you're not allowed to self-close a text area but because it's React, it's smart 
+enough to know. As well as normally, a text area cannot have a value prop but in React it can because we can bind that to our specific 
+state. So, input type-- Oh, who's here? Oh ho ho! (laughs) My wife got some Sephora. Thank you! Thank you! Okay, oh, that's enough of 
+that. So, let's (laughs) go back here. Type, number, don't need that. Id=description, name=description, placeholder=Enter A Description, 
+required attribute the value is going to be set to this.state.description, and then the onChange. So, let's see if that still works. 
+Beautiful. You can see it's being mirrored to my state here and the price just works just fine. Cool. Now, what we want to do is we need 
+a button for submit. So, button type=submit and that's going to say Submit. And normally, when you go ahead and submit this, it's 
+actually just going to put it all in the URL bar, which is not what we want to do so we need to listen for the submit event on this 
+form and actually push it up to our server. So, let's do that here. I'll say Form onSubmit is equal to curly brackets-- We can actually 
+do this right in line because the submit event handler is just going to be a couple lines of code. So, say we got the event. The first 
+thing you want to do with the form is call it e.preventDefault. That's going to stop the form from actually submitting and that's 
+going to stop that, like, URL thing that was happening earlier. And then let's just console.log(this.state) to see what we're working 
+with. So, one thing I do like to do when I'm testing this stuff out all the time is just put some default content into my states so 
+I'm not spending my whole day just typing in random boxes. So, dog.jpg, Large-dog.jpg, and price 1000. Now, if I refresh this now all 
+I have to do is hit the submit button and you see that we are stopping the form from submitting and we actually have our state. 
+Good! Now, here's the question. How do we get it to push the data to our GraphQL server? And that's done with a mutation but the 
+question is, like, "How do I do that? "Like, where do I send the data? "Do I send it to mutation?" And we first need to write a query 
+that is going to submit the data and then we need to expose that query's function to our form tag here via a mutation component. 
+So, what we'll do up here is we'll write our query for the mutation. CREATE_ITEM_MUTATION. You see how I always finish off my variables 
+with _mutation or _query? That's gonna help you in the long run, especially once we hit testing. You know that you need to mock it up 
+in a specific way. And that is going to be equal to gql``. And before we even do anything more, what we want to do is actually export 
+this. And that's going to be useful for both testing much later in this course, as well as sharing this query amongst other components. 
+So, let's export that. We've already used the default export so we can use a named export in ES6 to export that. I think we also need 
+to do that for items as well where we have this ALL_ITEMS_QUERY. Let's export the ALL_ITEMS_QUERY 'cause we're gonna need that 
+throughout the application. Uh, unexpected, oof. Oof, what happened? Oh, it's GraphQL error 'cause I haven't actually written 
+anything in here. No problem. We're going to write a mutation called CREATE_ITEM_MUTATION and that is going to run the createItem, 
+remember? Let's go to our schema real quick. Oh, it's not on. This is the front end. Let's go to our back end, let's open up our schema. 
+What is our mutation called? It's called createItem. So then we can hop here, we can call createItem. What are the arguments that 
+it takes? Well, it takes a title, a description, a price, an image, and a largeImage, so, we'll hop back here, we'll run that 
+createItem, and we will paste them in. I like to put them each on their own line. Now, what's going on here? How do we, like, get 
+the data to these ones? We title this.state but, like, this is a separate query. How does it know the data that is in here? And 
+that's where we need to set up our queries and mutations to actually accept arguments. So, we can go into this mutation 
+CREATE_ITEM_MUTATION and we're going to say that it's going to take a bunch of arguments and those arguments are going to be of 
+the same name, title, description, price, image, and we have to type them out. So, this is going to be a string that is required. 
+It's going to be a description that is required. This is going to be an int that is required. This is a string that is not required. 
+And this is a string that is also not required. Then, what that will do is when you call this CREATE_ITEM_MUTATION mutation, we're 
+going to pass it arguments of these names with these types and they're going to be available to us via variables inside of here. 
+So, this gets a little bit weird but we basically just have to take all of those and say use the variable of the exact same name. 
+And then from that query, we are going to return the id. So, woo! Let's actually-- Let me just tone that down to see exactly what 
+we're working with. Imagine that was just title and we'll put that on their own lines. So, this is sort of like a function called 
+CREATE_ITEM_MUTATION and that is going to take in one variable called title, which you should expect it to be a string. Now, when 
+it is called, run the actual mutation called createItem, which we've previously specified in our schema that's the back end, and 
+then use the passed in variable as title. So, anything that gets passed in here called title is available inside of it via dollar 
+and you can reference it. The fact that they're exactly the same name is just because that's what I've done but you could really 
+just pass in a string in here if you wanted but we are passing them in as variables. So, let's back that back up to what we have. 
+Do do do. So, our mutation takes five arguments. Then we will run it with these five arguments, passing each as a variable, and 
+then we simply just care about getting the item's id back once it has been created. So, what do we got here? "Expected dollar, 
+found name." Oh, I forgot to put dollar signs in front of all of these. And that also helps the syntax as well. So, the variable 
+title is going to be a string when called and then it's available to us with the variable title. Give that a save. Looks like it's 
+working. So, that is our mutation query that we have. Now, we want to go down here into our component and actually expose this 
+CREATE_ITEM_MUTATION function. So, how do we do that? Well, we're going to wrap our entire form tag in a mutation component. 
+So, we go up here, say Mutation, and then Mutation is going to take a query and the query is going to be the CREATE_ITEM_MUTATION. 
+A couple other things that need to be passed along. The variables that are passed when the mutation runs. They can be specified in 
+the actual component itself. You can also pass them at run time when you actually call the function but I prefer to do it in the 
+component here. So, we'll say variables is equal to. Well, what are the variables? This.state, right? So, when this mutation fires, 
+it's just going to take a copy of this.state and send all of those values along for the ride, which just so happens to line up with 
+all of the things that it's expecting. So, that's good. Then, just like query, the only child of a mutation or a query can be an 
+actual function. So, let's write a little function that we have here. And this one is a little bit different. Instead of taking a 
+payload, just a payload, it gives us the mutationfunction and the payload. And instead of calling it mutationfunction and payload, 
+I like to call it createItem. I like to always just match it up with what it looks like on the server side. And then you can 
+destructure this payload similarly to how we did it last time. And we only care about loading and error. There's also one called 
+called here, as well as data. Called will give you a Boolean if it's been run or not and data will give you the data that has 
+actually come back but we don't care about those two and I'll show you why in just a second. Then, from here, you wanna return 
+some JSX but what we actually want to return from this is everything down here. So, what we'll do instead of having an explicit 
+return where you return, like, a paragraph tag that says hey, we'll simply just replace these curly brackets here with parentheses 
+and that will give us what's called an implicit return in ES6. An implicit return is it will just return whatever is there without 
+actually having to use the return keyword. Then we take this one and this one and we're going to, do do do, go for a bit of a ride 
+all the way down to the closing form tag. Do do do, do do do. There we go. Thank goodness for Prettier 'cause I'm gonna give it a 
+save and all of my indentation will work just fine. So, let's take a quick look at what we've got going on here. "Argument undefined 
+passed to parser "was not a valid GraphQL DocumentNode." Why not? So, this error is telling us that the mutation that we passed in, 
+this little query that we wrote here, is not valid. And I took a quick look at my answer and this is actually not query, it's mutation. 
+So, if it's a query component then you pass it in query. If it's a mutation component then it's a mutation. Makes sense to me. 
+I just forgot about that. So, if we give that a save, now everything works to us. Now, all of that work was to just do a couple things. 
+First, we want to expose this createItem function and then second, we also want to expose the loading and the error state. 
+So, let's start with the error state first. So, I've given you a component called ErrorMessage.js and that's just in our components 
+thing right here. And what we're doing here is we first have some ErrorStyles that we have but this essentially just takes in any 
+type of error that might come in, either a singular error or an array of errors. So, Apollo will give us two different types of errors. 
+It'll give us a network error, which will always have multiple, or it will just give us a singular error, which we can put in there. 
+So, what this does it either loops over each one and displays an error at the top of the page for us, and then I also just replaced the 
+words GraphQL error with nothing, or it just gives us that one error in a paragraph tag with some nice styles on it and it even 
+shows us the actual error message. So, we get to reuse this throughout our entire application. Let's import that real quick. 
+So, import Error from './ErrorMessage'. You can call it ErrorMessages if you want. I'm just gonna call it Error. 
+Then we'll go down into here and in this case, we actually don't want to show only the error or the form, we want to show both. 
+And the reason behind that is because sometimes we're going to try to submit it and it's gonna tell us that something was wrong with one of our fields and we want to be able to fix it and hit submit again. 
+So, just above this fieldset here we're gonna give ourselves an error component and we'll pass the error of error and if there is any sort of error, this component is going to render itself out. 
+Otherwise, it's not going to render anything to the page. 
+So, good, we took care of that. 
+Next, let's take care of the loading. 
+Now, the loading is kind of interesting in this case because as soon as we hit submit, what's gonna happen is that it's gonna go off to the back end and then come back, hopefully quickly but it could take a second or two depending on network and server conditions. 
+So, we want to stop the user from being able to mess with this, edit it, or hit the submit button again and one way that I really like to do that is to wrap everything in what's called a fieldset. 
+A fieldset takes a disabled attribute where you can set it to true and that will just gray everything out. 
+See how I can't submit and I can't change these? Because it's set to true. 
+But I can just set that to loading and if loading is true, then it will be disabled and if loading is not true, if it's false, then it won't be disabled. 
+Then I also like to add the aria-busy attribute. 
+This is for accessibility. 
+It will tell the user if this group of fields is busy or not So, we just set that on there as well. 
+And I really like that because first, it's accessible, it's great for your users, but second, what it's going to do when we turn that to true, let's turn both of them to true, is it's going to do this little animation that we have there And let me just show you real quick what you've done there. 
+If we open up the form styles, we say... 
+The fieldset has a before pseudo-element that has a height of ten pixels and a background of this linear-gradient. 
+However, when the fieldset also has an aria-busy attribute on it, I'm just applying an animation of loading over half a second. 
+And then if we go up here, in styled-components this is how you do keyframes. 
+You just import the keyframes from styled-components and then you write your keyframes just as you normally would in CSS. 
+And I'm just going from background-position zero to background-position 100. 
+I tried to do some fun stuff with-- Here, let me show you what happens here with that. 
+Woo! So, obviously that's not (laughs) usable but you can leave it in there and have some fun with it. 
+So, anything from anything it will animate it from one to another and that's just a nice way to do loading. 
+You both disable it and show the user that something is happening. 
+So, let's go back to this createItem here. 
+We'll turn our disabled and aria-busy over to the loading attribute and then-- That's what I really like about Apollo is that it's going to flip those loadings onto true or false for us and we don't have to worry about turning Booleans on and off ourselves because it will give us all of that for us. 
+Good. 
+The last thing we (laughs) actually need to do is go ahead and handle the actual submit. 
+'Cause if I submit this thing right now, you see that we're just getting a console log of the data that is in there. 
+So, what we can do and say const res = await createItem function, right? CreateItem is how we exposed it via the mutation render prop and then we have access to it here. 
+Now, we also need to make this an async function so that we can await inside of it and then we simply just console.log the response to see exactly what we're working with here. 
+So, I'm just gonna give it a refresh, make sure I'm coming at it fresh, give it a submit. 
+What came back? Data, createItem, and it came back with the id of the item that has been created. 
+So, we can actually go ahead and look in our Prisma database to see if this new item has been created. 
+There it is. 
+I love those-- Did I write, "I love those context"? What am I doing? Shoes! Is what I love and that item has come in there. 
+Now, we don't want to just do that 'cause-- You see how it just temporarily ran that and then brought it back? There's a couple things that we actually want to do. 
+So, let's go inside of this event handler here. 
+So, let's write some comments. 
+Stop the form from submitting. 
+Call the mutation. 
+And then we are going to change them to the single item page So, what's going to happen after they create the item? We're going to bring them to this page. 
+Here, let me show you here. 
+This page item id and then we're going to use the item id in there to route them. 
+So, how do you programmatically route someone? We've only been routing people via the link tag. 
+Well, what we can do is import the Router from next/router, bring that up a level so that it comes before our imports and then down here, where we console logged the response, we're gonna say Router.push pathname is going to be /item and the query is going to be-- This is exactly how we passed it to our link tag. 
+The item is going to be the res.data.createItem.id and that's going to give us the actual id. 
+You see how we drilled a little bit deep? Let's just give it a quick test. 
+Say it's a Canada Goose jacket for that much and super cool. 
+Go ahead and submit it and it routes us to the specific page that we want. 
+Good. 
+We are going to have to come back to this 'cause we're going to hit a little issue with our pagination but for now, it's working and when we hit pagination, we're gonna come back and modify this component just a little bit so that we can do something called re-fetching queries where we can re-fetch the items that are on the home page.
+So, I'll see you in the next video where we deal with images
+
 
 ------------------------------------- #18 — Uploading Images (11:46)
+All right, let's get up and running with uploading some images. 
+In my Node course I showed you how you can use something called a Multer with Express in order to actually upload the images to your own server. 
+So I thought I'd show you something a little bit different in this course and that is uploading to a external service. 
+This is called Cloudinary and there's lots of other services out there. 
+I know Amazon allows you to upload images to them. 
+You could just use something like Imgur. 
+I really liked Cloudinary just because I've used it myself, this is not sponsored or anything, but when I put out a tweet poll, it was overwhelmingly that people wanted to see how to use Cloudinary to host their images. 
+Cloudinary is awesome because you can upload images, it will do transformations which includes everything, like a image compression, resizing images, cropping, applying filters, all kinds of stuff like that. 
+You get the point, anything that's related to images, you'll be able to do it on Cloudinary. 
+They give you 10 Gigs for free and then you can also refer a friend and get an extra what, two Gigs worth of bandwidth, which is pretty wicked. 
+So the free plan is pretty generous. 
+I've been pretty happy with it. 
+So here I've got a brand new account. 
+I just signed up for it, like I haven't even verified my email just yet. 
+Maybe I'll have to do that before we upload one. 
+I've signed up for it and I just wanted to make a couple settings changes that is going to allow us to upload from the client without having to have a server in the middle. 
+So click on settings here and we're gonna click on upload. 
+Now there's all kinds of different settings in here. 
+You can play with them, but we, what we really want to do is create what's called a preset and a preset set of settings that will apply to any of our uploads. 
+So we'll click on add, upload presets. 
+We're gonna name this preset called sick fits. 
+It's gonna be unsigned which is what we've had. 
+Folder that it's gonna go into is gonna be called sick fits. 
+You can apply tags and all kinds of stuff that you could possibly want. 
+However the thing that we do care about is down here. 
+And we want to edit some incoming transformations which is right here. 
+We're gonna set the width to be a thousand. 
+The mode is gonna be stuck on scale. 
+The format is gonna be auto and you can see some of the, some cheesy corner radius rotation. 
+Look and feel. 
+You can, I don't know, you can add a CPF filter like at the digital camera from 12 years ago. 
+That's all we want. 
+And then you click on, okay, that's gonna add those things here. 
+And then we're gonna add an eager transformation which is gonna sort of in the background transfer it to be a little bit bigger. 
+So we're gonna add an eager transformation. 
+Actually, sorry, real quick. 
+That shouldn't be not be a thousand. 
+The first one is gonna be 500. 
+And then in the background it's going to do a larger transformation that might take a little bit longer. 
+So, we're gonna. 
+Oops, I got to here, delete one. 
+We're gonna edit this one. 
+It's gonna be a thousand pixels, so twice the size and the, it's gonna be auto as well. 
+Good. 
+We are at the bottom and click on save and we are up and running. 
+Now let's jump back to our component here. 
+We are gonna put a method on our create item component that is gonna handle all of the uploading of our images. 
+Gonna do that right below the handle change and we're gonna call it upload file that I was gonna take in the event. 
+And let's just console dot log uploading file. 
+Now what we want to do is whenever somebody selects a file from an input box, we're gonna actually trigger this upload file to do it. 
+So we'll go up in here and right above everything else and I'm actually just going to take one of the labels for title and pasted above. 
+We're gonna change that to file. 
+And change this to say image, so input type equals file. 
+This file name is file, placeholder is upload an image. 
+It is the value is going to be this, that state dot image. 
+And then when somebody changes this input, we're gonna call that upload file method. 
+So this stuck up load file. 
+Now let's go to our application here. 
+Go to sell and I get it. 
+But in an error failed to set the value of property input, accepts a file name, which may be both because there is no value or move that and whoa, double what happened. 
+That was weird. 
+That was probably the fact that they went from error back to where we had it. 
+Good. 
+So we've got this image. 
+Let's go ahead and choose a file. 
+I've got a whole bunch of kind of cool things. 
+Ooh, nice cooler. 
+Upload it and let's see what's in our thing says uploading files. 
+So we. 
+Every time we change this, it's gonna trigger that upload file. 
+Good. 
+And then we're gonna actually do the heavy lifting inside of this. 
+First thing we're gonna do is pull the files out of that selection. 
+So say const files as equal to either target dot files fails. 
+That is a fail files. 
+There we go. 
+Then we're gonna use the form data API, which is part of Java script in order to sort of prep all of the data. 
+So say const data equals new form data and we'll take the data and append the file and that is gonna be the first item that the user selected. 
+Then we are also gonna add the upload preset. 
+This is a little piece of data that needs to come along. 
+So it append upload preset. 
+And this is just an argument that is needed by Cloudinary and it's going to be called sick fits. 
+So if you named your preset something different than sick fits, which is what you've done here, and make sure that you type that in there, otherwise it's not gonna work. 
+Now we need to actually hit the Cloudinary API. 
+So say constant responses equal to await. 
+Oh, are awaiting. 
+So we're gonna make this an async function. 
+And we're gonna use the third API to hit the API, so it's https, bomb bomb, api.cloudinary.com/v1_1/. 
+And then this is gonna be your actual end point and if you don't know what your end point is, you can see it right here on your upload page. 
+It will say the name of that you signed up with. 
+Mine is West Boss tutorial. 
+So forest West Boss tutorial for slash image or slash upload, good. 
+Then factual tick. 
+Another number of arguments as a second argument here, they say method is post because by default fetch does get and the body is gonna be the data. 
+That's this. 
+It's just the actual file itself. 
+And then in another argument called upload preset, that gets put along. 
+Then we want to do is it's gonna upload that and we want to parse the data that comes back. 
+So say cons. 
+The file is equal to await response that JSON Jews Sawn, JSON. 
+Here we go, and that's just gonna convert the response that we get into JSON. 
+And then we, let's just console, log the file that we have there, see what we've got, but we can actually put the data that comes back into these two spots of our state. 
+Where did our state go here? The image and the large image. 
+So let's do that. 
+This set state, the image is gonna be the file, that secure URL, a large image is going to be the file that eager first one dot secure year. 
+And again, the whoa, again, the eager is a secondary transformed that happens and it's gonna transform a larger version of that and I just used that as the secondary so we don't have to wait for both of them to come back. 
+That might make the requests a little bit faster. 
+So let's take a look here. 
+Let's go back up here. 
+A bit of an error, sink upload file. 
+Oh, that's because it's not a sink there. 
+This is a sink. 
+Good. 
+What I want you to do is open up your DEV tools, go to your reactive tools and find your create item. 
+And we're gonna watch the image and the large image of our state. 
+So upload an image up up and Bam, they came back. 
+Let's take a look at our console. 
+This is the data that comes back from Cloudinary. 
+It has all kinds of information about everything that's going in. 
+You can choose to save some more of this information to your database if you need it. 
+I'm specifically just grabbing the secure URL and the security Arielle from the eager one that was created. 
+And that is awesome. 
+Which should allow me now to submit this. 
+What was that? Camera sensor make to seventies. 
+Big Price and love these. 
+Go ahead and submit it brings me to it. 
+I should be able to now go to my homepage, scroll to the bottom. 
+And there they are. 
+Looks like they're showing up but a stretchy problem. 
+So, we'll hit that in just a second. 
+Also, I'd like to it to show at the top of this. 
+So we'll get into it. 
+But that item is now uploading it just fine. 
+So I'm happy about that. 
+One little thing you might want to add, I'm not gonna add it first simplicity sake, but you might want to when you submit this thing, this form, you might want to first check that the images done uploading because there could be a little bit of time where someone uploads a file and then immediately hits enter, then it's gonna send the data your API will still come back with a specific error saying, hey, you didn't provide to me a image or a large image but it's, it might be a better experience to do that to the user. 
+So let's try it one more time and go to sell here. 
+A blood annuity belt. 
+One thing I would like to do is to display the image to the user if there it is in there. 
+So let's go ahead and add that. 
+Oh, go down right below this input. 
+Curly brackets will say this, that state, that image and end, we'll do an image tag, this, that state dot image, and the Alt. 
+We'll set it to upload preview. 
+Will that show us? Beautiful. 
+Why are these images? So funnily spaced, oh, it looks like they're actually being sized like that. 
+So obviously a something wrong in my preset. 
+Let me go back and change my. 
+Oh, you see what I did is I set the height and the width of this image. 
+So let's edit that preset right here and the height. 
+Delete it. 
+That's just gonna auto scale itself. 
+That's why my images are being so funnily shown. 
+Another thing I can do here is on this image tag, you say width equals 200 and you see just a little preview of your image that is showing up. 
+You can go ahead and submit it. 
+Go back to our homepage and we'll see it show up. 
+I didn't submit that one. 
+That's why it's not showing up there. 
+Awesome. 
+So we got the R part of CRED, Read. 
+We've got the C part of CRED, which is Create. 
+Now let's go ahead and code up the edit screen. If I want to change the price,
+
+the name or the description of one of our items.
+
 
 ------------------------------------- #19 — Updating Items with Queries and Mutations (25:42)
+Alright, we're gonna get into the U of CRUD and that is the update. 
+So, a couple things we need to do is we need to first jump into our back end and update the interface for that, and then we'll come back into the front end and actually write the interface for doing that. 
+So, flippin' over to pink, which is back end, and we are going to first open up our schema at graphql. 
+There's gonna be kinda two things that we need here. 
+First, we're gonna need a query for a single item. 
+And that's gonna allow us to click on Edit and pull the existing information about that item. 
+And then second we're gonna need a mutation that will actually handle the updating of the item. 
+It's going to be very similar to how the createItem works, but slightly different because we're just folding in our updates. 
+So, let's do the mutation first. 
+We'll call it updateItem. 
+That is going to take in a ID, which is an ID. 
+It's going to take in a title, which is a string. 
+It's going to take in a description, which is a string. 
+You notice how I'm not requiring any of these, and that's because we might not necessarily pass the title if it's not updated. 
+We're only going to be passing the data that does get updated. 
+And the price, which is going to be an integer. 
+That is going to return an Item, and that is required regardless of what we have. 
+I'm gonna lay off the image and the largeImage on here, but I do, if you are looking for a little bit of extra practice once you're done with this course, then I'd say go back and figure out, how do I add that whole upload flow to my update, that we did to the createItem? Second, we're gonna go into Query, and we're going to query a single Item. 
+It's going to be item, that is going to take one argument, which is where, and the type of that argument where is going to be ItemWhereUniqueInput. 
+That is required. 
+Let me show you. 
+You might be saying, like, Wes, where did ItemWhereUniqueInput come from? Well, let's go to our prisma.graphql, which again is generated for us, and if you scroll down to where the query is, you're gonna see that they already have an item query that takes one argument called ItemWhereUniqueInput and returns an Item. 
+You can actually just go ahead and copy that and paste it. 
+You see that we're returning an Item. 
+There's no bang on the end because it's possible that we pass it, like something where it doesn't exist, and if that's the case, it's not gonna return an Item. 
+We don't want it to error out, that we have there. 
+So, that is good, and you might be saying, okay, what is ItemWhereUniqueInput? Well, it's just an input where you pass an ID. 
+We could also just say, okay, pass us an ID which is an ID, but let's kinda keep it the same. 
+Where I can make it the same as prisma.graphql, I would like to do that. 
+So, that looks good to us. 
+Now we need to write resolvers for both our updateItem and for our item. 
+So let's do the item first, since it's the simplest. 
+We'll just go into Query, and we just pretty much just duplicate this items and forward it directly to the database. 
+Because there's no extra logic, there's no permissions that need to happen, there's no logic in-between, you're actually querying the items, so you can just forward that directly over to the database, and give it a save. 
+Let's actually test that that works. 
+So, if we go to our local host, what was that, 4444? No, what was that? The way you can tell is, oh, I got a bit of an error. 
+Maybe that's what it was. 
+Syntax error cannot parse unexpected character backtick. 
+What did I do? Oh, what happened there? There we go. 
+It's running, it is on local host 4444. 
+Open it up. 
+You're gonna create a new tab called query SINGLE_ITEM, and that is going to grab an Item, where the ID is equal to, and in this case, I actually don't know the name of any of them, so can we query all of our items? There we go, let's grab cool shoes ID, where the ID is equal to this, and then return from that, we want the title, the description, and the ID. 
+Run it, beautiful. 
+You see that that query is actually working, item, where ID is equal to that specific ID. 
+Good, now let's go ahead and write the resolver for our updateItem. 
+So, we'll go into our Mutation, and we already have this createItem. 
+Get rid of this dog stuff here. 
+Make an updateItem. 
+That takes in a parent, args, context, and info. 
+And what we're gonna do is first take a copy of the updates. 
+const updates is equal to ...args and this is just gonna take a copy of everything that is in the updates. 
+Then we're going to remove the ID from the updates, because this is actually going to give us the ID that gets passed in, and we're not gonna update the ID. 
+The ID is not something you can update. 
+So we wanna remove it from the updates. 
+So we'll say, delete updates.id and then finally, we'll run the update method. 
+So, return ctx.db.mutation.updateItem So again, context is the context in the request, db is how we expose the actual prisma database to ourselves. 
+Then on top of that, we either have a query or a mutation, and then we have access to all of the mutations that are generated. 
+So, let's take a look here. 
+See, this is our mutation, this is our API. 
+This is all the things that we have access to inside of it. 
+So we can simply go here, updateItem, that takes in, well what does it take in? We can look here. 
+updateItem takes in data, and a where. 
+So the where is how we tell it which Item to update. 
+And the data is what data we actually want it to update. 
+So, go here. 
+We'll say the data is going to be the updates, and the where is going to be where the id is equal to the args.id. 
+So that's why we didn't just delete the ID directly on the argument object. 
+We took a copy of it because we actually still need to reference the ID of the item that is being pulled in. 
+Since we are returning this promise-based function, it will wait for that update to pass. 
+Finally, we also need to pass in a second argument, which is the info, and that's how this updateItem function knows what to return. 
+And if we take a look here, the updateItem is expecting us to return an item, so this will contain the query that we send in from the client side to return that item. 
+So I think that's enough for our back end. 
+Let's flip over to the front end now. 
+And let's open up the CreateItem.js. 
+And we're going to be reusing a lot of the markup. 
+It's almost close enough where you could probably put the Update and Create in a single file, but that starts to get a little hairy with a lot of logic. 
+I much prefer just to have two separate components used for updating and creating, but we'll sort of start at this as the base. 
+Go ahead and save a copy of CreateItem, and name it UpdateItem. 
+And a couple things we wanna do. 
+First, I want to rename CreateItem to Update Item. 
+Second, we want to change CREATE_ITEM_MUTATION anywhere it's accessible, so this is one, two, three, four places in this thing. 
+We're gonna make it UPDATE_ITEM_MUTATION. 
+Next we actually want to rip out the uploadFile handler that we have here. 
+So let's get rid of that. 
+We will also get rid of the Image. 
+Get rid of that. 
+And finally, this is, actually let's just get this showing on the page first. 
+I think we did enough there. 
+We'll come back and actually work on this. 
+So, we're going to make a page, so go to your pages directory. 
+Make a new file called Update.js. 
+And we can take a look at our Sell page for the very similar one. 
+Just copy everything from Sell, paste it into Update, replace CreateItem with UpdateItem. 
+Now the one thing that does need to be passed is the ID of the item, because if we go to our application here, and I click on Edit for the Nike 270s, it's gonna bring us to this Update page, where the query param is the actual ID of the item that we're trying to sell. 
+So, that ID is only available in that page, and if you want it to be accessible at lower levels, you can either export your component with a thing called withRouter, and that will expose it, or you can, you do have access to it on a page level because if you take a look at our app.js, remember we did this, pageProps.query equals ctx.query? We're exposing the query to every single page that we have, so that means it's available inside of this UpdateItem that we have here. 
+So you can pass it down here. 
+We'll say, the id is equal to this, which is the component, dot props dot query dot id. 
+And, oh, a little bit of an error here. 
+Cannot read property query of undefined. 
+So it's telling me that I don't have, oh, you know why, it's because I made this a stateless component, not a React component. 
+So what we need to do here is not use this.props, we can simply just say props.query.id, and pass it in. 
+What other people like to do is just use structure props immediately, which is kinda nifty. 
+So instead of saying props, you can put it in parentheses, destructure that into the query directly, and then in here you can access the query just like that, and it seems to work. 
+Let's just double check that, where if we go to our React DevTools, and you look for your Sell component, you see that we have this.props.query.id available to us, and if I were to put more things in the URL, wes equals cool, you see that the query now has ID and wes equals cool. 
+That should have been passed down to our UpdateItem. 
+And you see that the Props of this UpdateItem component is now being visible to us. 
+So, good, we have access to it here. 
+Now, let's jump back to our UpdateItem.js. 
+And, a couple things we wanna do here. 
+First, we can get rid of everything in our initial state because this is a little bit different in that we're only going to be putting things into state which have changed. 
+So, we'll make this state a blank object in this case. 
+Next we actually need to get access to the item itself, because when I refresh this page, we don't actually have access to the item. 
+All we know is the actual database ID, and we need to pull that from the database in order to populate the item so that the user can see what they're editing, right? So we're gonna do that with a query for that specific item. 
+Let's go up here, and we'll make a new query called SINGLE_ITEM_QUERY. 
+And we'll write our query. 
+That takes in one argument, which is an ID. 
+Has a type of ID, and it is required. 
+And that is actually gonna run it against the database with our item query. 
+It takes a where. The ID is equal to our ID that gets passed in. And returned from that, we need to get the ID, the title, the description, and the price. And we import our query component. We'll go over here, where it will write a query component to wrap the entire thing. And as we start to nest multiple queries and mutations inside of each other, I'm gonna show you a little trick that will allow us to compose them into one because this does get a little indenty for my likings. The query, where the query is going to be equal to the one that we just wrote, which is SINGLE_ITEM_QUERY, and then the variables that that query needs is just the IDs, so say variables is equal to, and you have to give it an object, where the id is equal to this.props.id again, because we're passing in, if we go over to our React DevTools, oh, it's obviously not going to work. Here, let me must show you real quick. Remove that out, we search for our UpdateItem, you see that this .props id is available to us. Good, then inside of the query we need to have a function, so we'll give ourselves curly brackets. That'll give us the data and the loading, we'll just use that for now. And from that we will just return, let's just return curly brackets. Now, this is where things get a little bit weird. We need to take this parentheses, this curly bracket, and this query, and we actually need to return the mutation, right? Because we're nesting the mutation inside of the query, which in turn will have the form that expose multiple queries and mutations to it. So, let's go for a little bit of a ride. ♪ Doo doo doo doo doo doo doo doo doo ♪ All the way down, right there. Thank goodness for Prettier, gonna give it a save. And, hoooo, that is lookin' a little bit gnarly to me. Again, we'll go into how you can get away from this because it probably reminds you of writing XML 14 years ago, not great. Let's go back up, see what we're working with here. Oh my, so the one thing that Prettier did is, I actually want to run an if statement here, and with the implicit return, you can't just go ahead and start running if statements here because you need a Javascript block in order to do that, and not just an implicit return. So, I'm gonna switch that back, so put a curly bracket here, type return in front of the thing that you want. Up here we're gonna say if loading return paragraph loading da da da dat. And then we gotta match up that other curly bracket and hopefully this doesn't ruin your afternoon trying to find it, but I like to use this match bracket highlighter here, so go doo doo doo, actually we'll click on this one, and find the closing parenthesis. There we go, add another curly bracket to it. And, it looks like nothing broke. We're actually in pretty good shape. So, if this seems like a lot, it's because it is. We have our query here, then we have that render prop function, then we do a check if it's loading or not, then if it's not loading, we are going to return our mutation, which in turn will render out the form tag, and that exposes both the data of the item as well as the UpdateItem function, which we're gonna rename in just a second. Woo! Alright, so next up we wanna take the data that was returned from our SINGLE_ITEM_QUERY, and put it into these input boxes. However, I don't wanna tie it to state directly. I wanna show the user what they have, and then if they change anything, I wanna then put it into state. So the way we do that is, we go to each one. We're gonna change value to defaultValue. That is setting a one-time value into the, and in React, the default value allows us to set a input box to some text without actually tying it to state because we're going to be actually mirroring this thing to state only when they change it. And then we'll change the default value not to this.state.title, but to data.item.title. And we'll do that again. Let's just actually see if that one will work. Hit refresh, there we go. So, Nike 270s show up. And if I were to look for my UpdateItem, state is empty, but as soon as I change this, you see that the new state of the change is now being mirrored to state. Let's do that with the price as well. It's gonna be defaultValue of data.item.price. And then we'll do that for the description. data.item.desciption Give it a refresh, good. Now you see, if we take a quick look at our UpdateItem, state is empty, but I've entered a change. The changes are now being reflected into state. Okay, good, good, good. Maybe we'll change the Submit to Save Changes. What we wanna do now is to actually modify this query that we have here, UPDATE_ITEM_MUTATION, where it's gonna take in a title, description, and a price. We don't need to pass the image or the largeImage. And it's going to return the id, the title, the description, and the price. Then we'll go down to our mutation component. And remember how we called it createItem here? Let's call it updateItem. And instead of doing the onSubmit in line here, 'cause I showed you that in the last one, let's actually shell it off to another function. When I was initially doing this, my question was, if everything is a render prop, how do you access this updateItem function outside of your render component, right? Like, how do I even access that? The answer to that is, you have to pass it to a function when it's submitted. So, let's take this onSubmit, and, let's actually just get rid of it altogether. Let's start fresh. There's a lot going on here. Form, we'll say onSubmit is equal to, and we'll take the event because we need the actual event that is happening, and we'll make a new function called this.updateItem, and we'll pass the event as well as the updateItem mutation call. So that's how you can pass methods to a component method, so we're gonna go ahead and write that ourselves. We'll say, updateItem is equal to, we get the update the event as well as the updateItem mutation, let's just call that mutation so we're different than the handler and the actual mutation itself. And then inside of that, let's just say Updating Item, console.log this.state. Go to our console here. Change all of these inputs a little bit. Give it a save. And, uhhh, it didn't work. Why not? The changes actually went to the title here. That's because I forgot to call e.prevent default, and actually this is, let's take a quick pause from this a second. If you go to the Update page, and don't pass it an ID, or you pass an ID is not real, it actually gives us an error, cannot read property title of null. And that's because our query here, what you can actually do is, say, if there is no data.item, then return No Item Found for ID this.props.id. There you go. No item found for ID, not real. And edit the 270s, everything works. Good, so we handled that. It's always helpful to try to break it yourself so you can find those little edge cases. In that case, the error wouldn't give us anything. But because it would return data of nothing, in our case we have to check for that specific data. Anyway, we were up here with this updateItem. We were preventing default on that. Does that work now, if I were to change this and save? There we go, we're saying updateItem, and then state is a copy of only the fields that have then changed. What we can do is we can call this updateItem mutation ourselves, so say, const response, r-e-s, is equal to await updateItemMutation, and in the last one, we just called that, because we passed the variables to the mutation. I'm gonna show you how you can pass them via an argument here, so you can pass the updateItemMutation to something called variables. Variables, so we can't say this.state, because it doesn't have the ID of the item in there. So, we're gonna have to make our own, so we'll say the id is equal to this.props.id, and then we'll also just spread in any of the changes that need to come along for the ride. So, this.state, that's gonna contain it. If you would have other stuff in your state, it might be worth it to make a sub-item, called like, item inside of here, and put all of your changes inside of that. But because this is, anything that goes into state is going to be a change, it's totally fine to leave it that way. So, we got that, we're awaiting it, Since we're awaiting it, we need to make this an async function, and then, let's just give a quick console.log, Updated. So, we'll change Nike 270s to Nike 99, save changes, and this is actually kinda neat. We got some errors here happening, and it handled them properly because our mutation has this error here, and it came back from the mutation and said, okay, there's an actual error, so we can't happen. So, it's telling us that the variable description of required string was not provided, and the price, 'cause I only changed the title. I bet if I tried to save it with no changes, it will tell me all three. Yeah, see? So, why is that required? Let's take a look here at our query. Oh, and that's because string isn't required. Price isn't required. And neither is title. So, give that a save. Now, if we refresh it, and change these to Nike 99, save changes, oh, one more problem. Shoot, variable data got invalid value, title, field value.description of, the description is required. So now, maybe something on the back end we accidentally had marked as required. So let's take a look at that. ID is required. Title, no. Description, no. Price, no. Oh, and I figured it out, this is the problem with copy pasting from the CreateItem. We forgot to change the name of the function that gets run on the server from createItem to updateItem. And that should do it for us, so, let's give it a fresh refresh, change this to Nike 99, give it a save, and, oh my gosh! Update argument ID, type of ID was required, but not provided. What is going on? Oh, we forgot to actually pass the ID in the mutation. This is where graphql, because it is so strictly typed, even though we are passing the ID right here, because the UPDATE_ITEM_MUTATION was not expecting it, it just ignored it from us, so, I'm gonna leave all these little errors in because I think it's helpful to see the common stuff that you trip up on, and what the debugging looks like. So, we'll add that in real quick. So there's going to be a variable pass called id which has a type of id, and that is the only thing that is required here. And then, when we run it, we're also going to pass the id, which is the variable id. Okay, is it gonna work? If not, I'm gonna quit my job and move to the forest and become a lumberjack, which I probably wouldn't be very good at either. Save, hey hey! Updated! It worked. Actually, it's kinda cool. You see that our loading kicked in real quick. And now if I refresh the page, you see that Nike 99 is there. Let's change the price to 200, and say real cool. Save changes, and it looks like it worked out. One kinda little fun thing that I like to do is, if we go down here, we can take that loading variable and have a little bit of fun. So you can say Sav, and then if it's loading, i-n-g, otherwise, e. And that should say, and that should change the word to Saving whenever I click on it, and flip it back. That's why I love Apollo so much, is that it just gives you this loading boolean, and you can do really easy things that make the user interface better for your user. So, that is updating our items. We've created, we've read, we've updated. Next up, delete. It's gonna be actually really really simple. (laughing) It's gonna be one of the shorter videos,
+so I'll see you in there.
 
 ------------------------------------- #20 — Deleting Items (13:04)
+In this video we are going to write up the delete button of our, so if we go ahead and click on Delete, it's gonna ask us if we wanna delete it. 
+If we press OK, it's going to remove it from that page and then ideally when we hit Pagination, it's gonna refetch that query and then also update our pagination that we only have one page and I'll remove that. 
+Good, so let's open up our item.js component and we have this button right here called Delete. 
+We're gonna turn that into its own component so we can abstract away the logic and use that button wherever it is we want on the page, so I'll make a new component called Deleteitem.js. 
+Gotta scaffold out a React component. 
+And I'm going to remove that item. 
+And for now, let's just give ourselves a button, so that's Delete Item. 
+We'll go into our item.js and import that. 
+We'll go down here. 
+Give ourselves the DeleteItem. 
+Actually, what we could do here is so that you can, instead of hard coding the text Delete Item because you really could put anything that you want inside of there, let's actually make it a component like this and in here we'll say Delete This Item and we'll go in here and you can just replace that with this.props.children and that should do it. 
+Let's go to our home page here and we see that our Delete Item button is showing up. 
+Awesome, so we're gonna flip over to our backend and start writing the process for that, so go to Go To Pink and open up your schema. 
+We need a new mutation that's going to be called deleteItem. 
+That takes in an ID which has the type of ID. 
+It's going to return an item. 
+You could also create a new type called like success message and return that with a strong with a message but in our case, let's just keep it with returning an item. 
+Then we want to code up a resolver for that, so we'll go into the mutation.js. 
+Make a new one down here. 
+Parent, args, ctx, info and we want to make a where variable because we're gonna be reusing this a couple times and we're gonna actually set this up assuming that we're gonna have authentication in just a bit, so I'll say const where is equal to the ID is equal to args.id. 
+Then first thing we need to do is find the item, step one. 
+Two, check if they own that item or have the permissions. 
+And three, delete it. 
+So, the reason why we find the item before we go ahead and delete it is because we are going to be querying the item first to check if the person deleting it either owns it or the person deleting it has permissions to delete any item like you're an administrator on the site. 
+So, we'll say const item is equal to await, so we did await, let's change this over to async, we can take the context.database.query.item and we're gonna search for an item and we're just gonna pass the where that we created. 
+Now, what's interesting about this is that this query right here, usually we just pass in info and by passing in info, it's going to take any of the query from the front end, let me open up UPDATE_ITEM that we just did. 
+It's gonna take in the query and request that these fields come back. 
+However, sometimes we have an intermediary, we have to perform a second query and in that case, the info doesn't get passed here but we're just gonna manually pass a query ourselves, a GraphQL query, so I'm gonna use back ticks here, it doesn't matter which quotes you use and we specifically want to ask it for the ID and the title of that specific, so this is just raw GraphQL that we're passing in here and it will parse it for us. 
+In the future we're gonna come back and ask for the user and the ID of the user but in this case, we're not gonna have users just yet so we can't have that. 
+Second, check if we own it, TODO and then third, delete it, we return ctx.db.mutation.deleteItem, we pass our where and our info. 
+Looks like we've got our schema and our resolver set up. 
+Let's flip over to the front end now. 
+Go back to Deleteitem.js. 
+And we're gonna import a couple things up here, so import Mutation from react-apollo. 
+We're gonna import gql from graphql-tag. 
+Then we'll go here and write our query or our mutation, DELETE_ITEM_MUTATION, so mutation, and I'm going to delete the item, the ID is equal to the ID. 
+And we're just gonna ask for the ID of the item back just so we can have something returned and know that is actually deleted. 
+Good, now we wanna take this button here and wrap it in a mutation component, so I'll take a mutation component, put the button inside of that. 
+Mutation takes a couple things. 
+First, we need the extra mutation itself. 
+And then we also need to pass some variables, so how do we know which item we're actually deleting? Well, we don't right now, so we have to pass it in, so we'll go back to item.js and we'll pass that in. 
+We'll say the ID of the item that this button can remove is the item.id and then we'll just go into here and say this.props.id is the name of the variable. 
+We also wanna do structure and error because we wanna tell the user if there's an error. 
+Specifically you don't own this item, you can't delete it. 
+And we will change those curlys to parentheses and put the button inside here. 
+And this is button is gonna have an onClick handler where we run a little function inside of here and we'll just run a confirm, say are you sure you want to delete this thing? So, we'll say if confirm, sure you want to delete this? Then we simply just run the deleteItem function that was passed in via our mutation, give it an all save, little bit of an error here. 
+Oh, semicolon. 
+Let's go ahead and try delete it. 
+Delete this item. 
+Are you sure you wanna delete it? OK. 
+And nothing happened but I think it worked and the way you can tell if it worked is if you give it a refresh and you see that test is gone. 
+So, this is where we get into interface updates in Apollo because that item is going to be deleted on the backend but it's not gonna be deleted in the cache, so if you actually wanna update the cache and you wanna remove it from the page, you have to manually do that yourselves or there's kind of like two options here. 
+The first option is that we could refetch this entire query on the home page and that will manually hit the backend for a list of items and come back with an updated version. 
+That's a good option. 
+However, sometimes you just want to remove one of those items from the page and that's exactly what we wanna do here, so that's done via an update function. 
+The way we would do that is we have our mutation, argument for mutation, we have our variables argument here and then we have a third one that's called update and I'm just gonna say this.update and we'll shell that off to a separate one and go here and say update is equal to a function and Apollo will give you two things when the update happens. 
+It'll give you access to the cache which is the, here, let's take a quick look what is the cache, it's this, Apollo, go into the cache and it's all of the items that it actually has. 
+And then it will also give you the payload or the data that has come back from the item that got deleted and here we can just like manually update the cache on the client so it matches the server. 
+Now, there's a number of steps we need to do here, so first, we are going to read the cache for the items we want, so what items do we need to read? We need to read these four items here and unfortunately you can't just reach directly into the cache and delete one, you actually have to use a GraphQL query to read the items from the cache and have the ability to write back into the cache, so we need to ask ourselves, what is the query that was used to get these items onto the page in the first place and if you open up our items.js, you'll know that we use the ALL_ITEMS query and route it here, so the reason why we exported it and if you haven't done this, please make sure you have, we exported this ALL_ITEMS query, that's right here is so that we can import it into here, so let's say import ITEMS_QUERY from sibling Items.JavaScript. 
+Then we can go back to our update here and we'll say const data is equal to the cache.readQuery and you can specify the query that you want which is ALL_ITEMS_QUERY and let's actually just go ahead and console.log that data to see what we're working with. 
+So, I'm gonna give it a quick refresh, go to console here, I'm gonna delete an item, click OK and you see that that query gives us access to all four items that are currently on the page for that cache. 
+So, we got one, two, three, four, so what we're gonna do is we're going step two, filter the deleted item out of the page. 
+Data.items is equal to data.items.filter and we're just gonna loop over every single item and only include it if it doesn't match the deleted one, so item.id is not equal to the payload.data. 
+And actually I don't know what the name of it is, so let's actually go back here and console.log the payload and let's just comment that out and we'll try delete another one. 
+Now, you can't try delete this one again 'cause I just did that and if you try to do it, it's gonna error out because it's actually gone, so I'm gonna refresh the page. 
+I'm running out of stuff, I might have to make some new items pretty soon. 
+And delete this item. 
+There we go, so the payload that we get is the second thing and that's this right here and then inside of that you have the data and then we have the deleteItem. 
+That's how we know what is actually called. 
+So, we'll bring this back, data.items equals itself, filtered out for deleteItem.id. 
+Then we will put the items back. 
+We'll say cache.writeQuery and the query is going to be the ALL_ITEMS_QUERY again and then the second argument is just going to be data is equal to data but you can remove the second data there and just say we're passing it, so you see how we updated the data that we have here and that should write itself to the query, so give that a save. 
+Gonna refresh. 
+Only got one more item or two more items here. 
+I'm gonna delete it, click OK. 
+Once it comes back from the database, it actually removes it from the page and then let's, why not, let's go ahead and delete all of them. 
+Now they're all gone. 
+And so, that is it, we have our delete items, I just deleted all of mine, so you might have to go ahead and add three or four new items. 
+Don't had too, too many because we are going to have to clear 'em out once more
+before we create our users.
+So, I'll see you in the next video.
 
 ------------------------------------- #21 — Displaying Single Items (12:33)
+All right, now when we actually click on one of the items, you'll see that it goes to /item and passes the ID of that item along for the ride, but we get a 404 because we don't have an item page. 
+So let's go ahead and create that. 
+First thing we'll need to do is just double check that we have the right back-end stuff for us. 
+So let's head over to our schema.graphql. 
+You'll see that we already have a query for a specific item, where the input is an ItemWhereUniqueInput. 
+Again, if you're not sure what that input looks like, we can take a look at our generated prisma.graphql, and we just take a quick look for, here we go, the input ItemWhereIDInput and it expects just an ID to be passed to it which is exactly what we have. 
+Second, what we want to do is to double check that we have our resolver. 
+So if we go to our query.js which is in our resolver's folder, you'll see that our Single Item is just being forwarded to the database good. 
+So there's no extra back-end stuff that we need to make here. 
+Let's jump over to the front end here, and create, first, we'll create the item page. 
+Let's just open the index.js, and you see that this is the item's page. 
+We'll just duplicate that into item.js. 
+Again, this is in the page's folder, we'll make an item.js, and we'll rename this from home to item. 
+Remove that. 
+And let's just do a paragraph tag, says Single Item. 
+Give it a save. 
+Now, if I refresh this page, we get Single Item showing up. 
+Good, we're going to need another component, so go into your components folder and make a new one. 
+We're gonna call it singleitem.js, and we'll create the component that we have here. 
+So, export default. 
+Again, I'm gonna move this down here. 
+Export default SingleItem. 
+And, let's just do a paragraph inside of here that says: Single Item Component. 
+And we'll import that into our item, and we'll try to go ahead and use it. 
+There we go, Single Item Component is now showing up. 
+All right, so, let's start off with the query, and then, we'll get into actually templating it out. 
+So, we'll go up here and make a query. 
+const SINGLE_ITEM_QUERY is equal to gql, and we need to import that. 
+Inside of here, we'll make the query, SINGLE_ITEM_QUERY, takes in an ID, which has a type of ID and that is a required. 
+And then, we will give ourselves the query of item, where the ID is equal to the ID that we passed in. 
+And from that, we want to return the ID, the title, the description, and the large image. 
+Now, how do we get this query into our item? Oh, this is actually wrong. 
+I don't wanna put the query on the page. 
+So, let's actually move that over real quick. 
+So, I'm gonna take that out and go into SingleItem, paste it in here, and then, this looks fine. 
+Good. 
+Then we need to wrap this entire thing in a query component, so, we'll import that from react-apollo. 
+Then, I'll go down here, and before I wrap it in a query, I just want to make sure that we actually can get access to this item ID here. 
+So, let's open up our dev tools and take a look at the props that this Single Item has. 
+Search for Single Item, and you'll see that the props are empty. 
+Now, if we search for the item component, you'll see that the props does have access to the query. 
+So, that means we have it right here, but we don't have it right here, and the way we can pass it down, is just by props. 
+ID is equal to this, it's just props.query.id. 
+And then, if we go to our Single Item, you'll now see that it's being available and can we displayed that inside of here? I bet we can! Props.id. 
+And, oh they have an error, props is not defined, oh it's 'cause it's a proper component so we'll say this.props.id and there we go, the ID is showing up. 
+Good, now we'll go over to our item. 
+Now let's take this div and replace it with a query. 
+Then the query itself is going to be the SINGLE_ITEM_QUERY, and then the way we can pass the variables is just by the variables prop on the query component. 
+So variables is equal to an object literal and the ID is going to be this.props.id. 
+Then inside of here we can have the child which is going to be our payload that has error, loading and data. 
+That can be an arrow function. 
+We'll say, if error, return Error, and we can do that for loading. 
+Otherwise, we are going to return the Single Item component. 
+Let's just double-check this works before we keep going. 
+Bit of an error here. 
+Oh this paragraph, properly spell return, and looks like it's working. 
+We should be able to console.log the data. 
+And you see the actual item showing up here. 
+I don't wanna actually just display error here. 
+Let's just import that error component that we have. 
+So we'll say import Error from ./Error message. 
+And then we'll go down here and render out an actual error component. 
+Error, Error equals error. 
+Now one things this will not do is actually if I put like an X on the end of this URL here and we don't get any sort of item you'll see that it actually still renders out the Single Item component, so we can handle that in one of two ways. 
+We could on the server side, we could do a custom resolver here and if there is no item found we can simply just throw an error on the server and what that would do is it would resolve to an error over here. 
+And then this error component would display whatever message that we throw. 
+Or what you could do is if you wanted to handle that client side, you could check it right here. 
+So we can say if there is no data.item, we're going to return and paragraph no item found for this.props.id. 
+So, I'll show you how to do it on the server coming once we get into custom resolvers, but for now let's just actually handle that in the client side, and you can see that it's showing up here. 
+I take the X off the end. 
+Item shows up and the Single Item component is now rendered. 
+Now it's just a templating exercise. 
+We're gonna get all the data from this item showing up on this specific page. 
+So I am first gonna make a styled component up here. 
+So import styled from styled components, and we'll make SingleItemsStyles, that's a styled.div, give it a max width of 1200px, a little wider than our usual. 
+Margin 2rem auto. 
+Box shadow is gonna, we're going to grab that from our theme props, so we'll call it .bs. 
+Display grid, grid auto columns 1fr. 
+Grid-auto-flow column and min-height of 800px. 
+Let's just start with that and we'll come back to it. 
+So we'll go back here and replace this paragraph with our SingleItemStyles. 
+And inside of there, let's give ourselves an image where the source is going to be equal to the data.item.largeImage, and what we can also do there is instead of saying data.item every single time, you could either de-structure it right in here, or you could just make a little variable, that's what I'm gonna do right here, so const item equals data.item. 
+And then here we can simply just say item. 
+Same with the alt to make sure to set your alt, it's going to be item.title. 
+See if it starts showing up? Looking good! All right, all right. 
+I like that. 
+Now one kinda cool thing I want to show you is this head. 
+You see the tab of our Chrome here just says Sick Fits? What we did in our meta component if you take a look, you see that we have this title of Sick Fits, but what if we want to sort of reach outside and update that? That's where it gets a little bit complicated. 
+Does that mean you have to pass the item directly to the meta? And sometimes you query something in a component, but you need to update something else on the page that's a little bit higher, or in our case, is not even part of the document, it's part of the head tag in the HTML document. 
+So that is what is called a side effect, and a side effect in JavaScript is where you reach outside of something to update it. 
+And generally side effects are a no-no, but in some cases you absolutely have to use them. 
+And if you wanna update the title tag, that's exactly what where we do it. 
+And we're not going to be doing it via just like document.query selector, we're gonna be using something that's built into Next.js that will allow us to introduce side effects. 
+So the first thing we wanna do is go up here and import the head tag from, what is it? Next head. 
+And you'll notice that we actually did that up here. 
+Import the head tag and then we have a head tag and inside of that we just stick whatever we want. 
+Well you're allowed to have multiple head tags throughout your application and it will just collect them all throughout your application, and apply it to the actual head of the rendered-out document. 
+So this is pretty neat, because all you can, what you can do is just simply go down here, give yourself a head tag, and this might seem a bit weird because you're nowhere near your actual head of the document, but you can put it in here and it's going to take it out and put it into the proper head tag. 
+So we can give ourselves a title. 
+We'll say it's Sick Fits, and give ourselves a pipe, and we will just put the item.title inside of there, and you'll see that the TNF Fanorak Pullover is now being pulled into the head tag just because we've done this. 
+And if we were to inspect that in our dev tools, you wouldn't see any actual rendered-out HTML, that will all be removed before the actual render. 
+So that's how you introduce side effects with Next.js when you're trying to update your meta tag, and same thing would go for any of the tags that you would want to put on a specific, like if you wanted to introduce a custom favicon only in this Single Item, then you totally could by introducing it with the head tag. 
+Good, we have our image, let's go and do a few more of the things up, so we'll give ourselves details div, div with a class of details and then we'll have an h2 Viewing item.title, paragraph with the item.description, and we'll have some items that will allow us to add it to cart as well as update them, but we'll come back and code those buttons in in just a little bit. 
+Right now it's showing up but it's looking a little bit goofy so we'll go back to our CSS up here and write a little more CSS. 
+So say the image. 
+A width of 100%, a height of 100% and an object fit of contain, and that's kind of a cool one. 
+I'll come back and show you exactly what that does. 
+Actually you can see it here. 
+So if this image is extremely wide and short, or if it's extremely tall and wide, it doesn't matter because it will always fit it in. 
+It's kinda like background size cover or background size contained, but for actual image tags and I love that because you can stretch an image and not actually worry about it being stretched. 
+If I didn't have that, it would look much worse. 
+And you see, that doesn't look good, but you put contain in there, you can also put in cover, and that will actually cover it regardless of the width and the height and it'll chop either the sides or the top and bottom off. 
+Let's give ourselves a detail selector here, Which say margin 3rem and a font size 2rem. 
+And things are looking good. It's a little bit plain but we'll come back and add some actual buttons to it. So that is our Single Item that is now being rendered out.
+Let's flip over to working on the pagination.
+
 
 ------------------------------------- #22 — Pagination (15:12)
+Alright, now we're gonna be working on Pagination, so what I want you to do, is make at least nine different items in here, and then I'll meet you back here when you've got your nine items. 
+Alright, I've added a couple now, I just want to show you one little problem that we're gonna be running into. 
+If you click on your homepage after you've added something, you might not see all of the items that you've added. 
+I just added the denim here, and it's not showing up, until I actually refresh, and that's actually a problem because the cache is caching all of the items, and when we go back to the homepage, it goes, oh, I already have that query. 
+So, we're gonna need to look at how we can actually invalidate that query, and there's a couple of options that we can do. 
+Also, there's gonna be some stuff coming to Apollo fairly soon, and I'll make sure to update these videos once they actually are in Apollo, because right now, it's a bit of a problem. 
+Especially as we get in to Pagination. 
+But, I've got my nine items here, let's go ahead and start making it. 
+We're gonna go into the front end here, and you're making new component called Pagination with a capital P. 
+Let's go ahead and we'll code it manually, now import react from react, import our Pagination styles from the styles folder, and let's just make it a stateless functional component. 
+Export it. 
+Now, let's go into our items component, and import our Pagination, and we can just stick that Pagination component wherever it is that we want to put it. 
+So, let's do it right above the query, and let's do one right below the query, so we can get one above and below, and there we go. 
+High on the Pagination, and we've got another one showing up on the bottom. 
+Good, now there's a couple things we actually need in order to make our Pagination. 
+We need to know how many items are in the database of total, how many items are on the current page, how many items are we displaying per page, and we could do that right now because we're displaying them all on one page, but if this were to have a thousand items, we don't want to write a query that's going to fetch one thousand items or even something simple, like fetch the ID's of one thousand items, as that would be too large, and that's where prizma connections come in. 
+Now, let's go back to our back end here, and let's look at the generated esquema that comes out, and just search for connection. 
+If we look at our queries here, you'll see that we really only have two types. 
+We have users and user, and item and items, so that's going to grab both of our types. 
+However, each of them also have an additional query, called the user connection or the item connection, and that's going to return to us aggregate data about the actual data itself, and specifically, we need to know how many items are available to us. 
+That's what we need to do in our own esquema here, we need to go into our schematic GraphQL on the backend, and under our query, we're going to type our items connection, and that is only going to take one argument item where input. 
+You could also pass them order by, first, last, and skip in this case, but we only care about the where in this case, and that's going to return in item connection. 
+That is required. 
+Good, now let's go into our resolvers, so query.js, and we're just going to duplicate this and make it items connection, and we're gonna forward that directly to the database as well, and the way we can test if this has worked, is we can open up our local API and try to connect to it. 
+So, let's go through local host four, four, four, four. 
+We'll just write a quick query here, and we'll just call that query data about items, and we're going to use our item, there it is, there's our items connection query, we don't need to necessarily pass a where right now, we can just say items connection, and returning from that, we can return a couple things. 
+The edges, the page info, or the aggregate. 
+The edges and the page info, that's used for when you're sort of doing infinite scroll. 
+Let's say you're on Pinterest and you loaded in 20 items, and what you could do, is that's going to tell you what the last item was, and then when you do a second query, you can tell it, give me the items that are past this. 
+Now, we're doing traditional Pagination here, instead of that sort of infinite scroll here, so we're not going to be using edges or page info. 
+In this one, we're going to be using aggregate, and doing the calculations ourself. 
+From the aggregate, the only thing we can query of that is the count. 
+Now, if I were to run it, it will run, and it tells us that we have nine items in our database. 
+If you were to change this, you could also use this on a search page that you're Paginating. 
+You could say where the title contains, let's say shoes, run it, nothing comes back. 
+What are some of the items that we have? Pullover. 
+Where the title contains pullover, and it gives us one item. 
+So, you see how you could pass possible arguments to this. 
+This would also be extremely helpful if you had categories and you needed to Paginate things that were just based on the category. 
+Let's go up into our front end now, now that it's all working, and go into our Pagination and start working on our query. 
+We're only going to get the actual linking working right now. 
+I just want to change the URL by clicking all of these numbers, and then we're gonna circle back and actually modify the items component, which is showing all of them right now, and we want to be able to show just however many that we want. 
+So, we'll import GQL from GraphQL tools, and we'll make a query, and we'll write our query, and call that Pagination query, and we'll go ahead and write our query called Pagination query. 
+We actually don't need to pass at anything, so I put parentheses there, you don't need it, because if you look at our backend here, you see our items connection where item input, we actually don't need that, cause we just care about how many items are in the database, the current page, the number per page, and all that other information is either gonna be pulled from settings, from the URL, or calculated when we render the component, so we have our Pagination query here, we are going to have the items connection, that's our query name, and from that we are going to return the aggregate, and that is going to give us the count. 
+Now, we can use a query component to pull that in. 
+Go in here, give ourselves a query component, query will be Pagination query, and inside of that, we will get our data, our loading, and our error. 
+From that, let's just return. 
+Hi, I'm the Pagination. 
+It's broken, let's see what it is. 
+I've got a red underline. 
+GraphQL tools should be listed in the dependencies. 
+No, it's not GraphQL tools, it's GraphQL tag, and that should go down here. 
+My question is, are we able to render out the data to itemsconnection.aggregate.count? There I go. 
+Nine, it tells us we have nine items that are on there, so that means we are in good shape. 
+Going to change this from a implicit return to an explicit return, so what we're going to do here is put some curly brackets around it. 
+Down here, we're gonna type return, and let's just say if loading turn loading. 
+Just need to have some sort of if statement, so my prettier doesn't get it. 
+It looks like it's working well. 
+Now we need a couple pieces of information. 
+First, we need to figure out how many pages are there going to be based on our per page, so if you open up the config.js, you'll see that we have this little number four right here, so I like to put that in a separate file so that if I ever change Pagination, it will just ripple through the entire application. 
+So, we're gonna import that. 
+Import per page from... 
+First I'm gonna put this count in it's own variable, just called count. 
+And here, we'll just say const count is equal to that. 
+Then we'll make a new variable called pages is equal to count, divided by per page, and let's just start writing some information here. 
+Say you are on page, this is page one of pages. 
+It says, you are on page one of two point two five. 
+Why? That's cause I have nine items. 
+Obviously, we can't deal with that, so what we can do is wrap that in a math.seal. 
+Seal, ah, just joking. 
+Ceil, it's not the animal. 
+Here we go, page on of three, looking good. 
+Now, how do we get the actual current page? Well, let's actually go to our items, and it's going to look a little bit something like this, page equals two. 
+Now, that page equals two is going to be coming in via the items page as a prop, so we need to pass it down. 
+Let's go to our items page, and oh, it's actually not done in our items. 
+Actually, we gotta rename that to items real quick, it's not home. 
+But, it's in our index.js, that's where we're actually doing the heavy lifting, right here, and we have it via our prop, so we are going to say page is equal to props.query.page, and then our Pagination component should then have access to it if we inspect it. 
+Check out our react dev tools. 
+Search for Pagination, doesn't look like we have access to it, and that is because I haven't passed it down yet. 
+So, I passed it from the page down to items, and then we need to go into items and pass it down to Pagination, so we'll grab both instances, and just say page is equal to this.props.page. 
+And then, does it show up here? There we go. 
+Page is showing up, it is showing up as a string though, that's gonna be a problem for us. 
+So, what we'll do in our index, is before we pass it, we'll wrap it in a parseFloat. 
+Give it a refresh, and you see it's passed as a number now, there's no quotes around that. 
+Good, so we can go into... 
+Back to our Pagination and replace that with, we can say this.props.page. 
+Nope, it's not this.props, it's just props.page. 
+There we go, it's being passed in. 
+However, if we go to just forward slash items, we get naan, so what we'll need to do here, is back to our index such as, and pass either that or one, and that will fall back to one if it's on the first page. 
+Now, if I go to page three, it will say page three of three, good. 
+Let's actually get some links working so I don't have to manually type it into the URL bar. 
+Back to our Pagination here. 
+I actually wanna bring these Pagination styles down inside of the return, cause I only wanna display them when the Pagination is actually shown. 
+Then, inside of that, we can, let's actually update the title bar, just like we did on the last one. 
+Import head from next head, and here we can say head, title, sick fits. Flicks? Fits, page, page of pages. It's not showing up, cause let's make a quick variable, const page equals props.page. There we go, you see that the URL bar is now showing up. Maybe put a little M dash in between that. Let's get ourselves some links. We'll import the link from next link, and of course, we wanna move these above our relative imports. I always like to do my MPM imports, then my relative imports, then we'll go down here, above the paragraph tag, we'll give ourselves a link tag. That link tag always takes a HREF, which is an object. The path name is going to be items, and the query is going to be page, and this is going to be the page, minus one. If we're on page two, it's going to be page one, if we're on page three, it's gonna be page two. We'll look at how we can disable that in just a second. Then, inside of there, you want an empty link with no HREF on it, and then that will just say prev. Let's take a look at how that looks. Here we go, got our prev showing up. Now, a couple things here. First, I want you to go ahead and put a pre-fetch attribute on your link, and what that's gonna do, is in production, it's gonna go off and pre-render both the previous and the forward looking page, so that you are always pre-loading the next and the previous one, so that when you hit your Pagination, it's going to be absolutely instant. This pre-fetch does not work in development mode, so it might be a little bit slow for us, but it will always work in production mode to pre-load other pages. You can put this pre-fetch attribute on any of your links, and it'll make your website just so much snappier and it's just such a nice little performance boost that you have. This link here needs a class name, so class name is equal to prev. And then, we will give it a disable attribute. If we're on the first page, then obviously, we don't want to give a previous one, so we'll say aria dash disabled, is equal to the current page, is less or equal to one. So, now it's working. If I were to go onto page one, you see it's disabled, cause obviously, there's no page zero. I don't want to go into it. Then, we have our paragraph, tells us how many pages there are. Let's give ourselves another paragraph that says, count items total, so it will tell us how many items we have. So, previous, page one of three, nine items total, and then we can just take this link here, paste it below, and we can say that it is the page plus one. It's going to be disabled if the current page is greater or equal to the number of pages, and this will just say next. That's a little text expander snip that I have if I do two angle brackets ever, it'll automatically make it an arrow, cause I use that so often. Give it a save, and now it seems to be working. If I click on next, it's going to load up page two. You see our previous are kicking in. Next is gonna load page three, then it's disabled, doesn't work, so I can go back and forth, back and forth, next, next, next, prev, prev, previous, and these items get updated as we go. What's not happening, is that the actual items on the page aren't updating themselves, so that's a bit of a problem. In the next video, we are going to tackle how do we modify this items component
+to actually take the page number into account.
+
 
 ------------------------------------- #23 — Pagination and Cache Invalidation (09:37)
+In the last video, we did this little pagination, where you can click back and forth but it doesn't actually affect the items. 
+So that's what we're going to be doing in here. 
+First thing we need to do is flip to our backend, and open up our schema out of graph.ql, and we need to be able to modify this item's query here to take a couple of arguments 'cause right now, all the items query does is it just returns you a list of all of the items and there is no way to tell you how many you want, which ones you want... 
+What are the different arguments that you want to pass it, so we're going to modify that here. 
+It's gonna take in a number of different arguments. 
+First one is going to be where, in case we want to be able to do searching, which we will. 
+It's going to be item where input, then we also want to have order by; if you want to order them by most recent or least recent-- So item order by input; we want to have a skip value, which is going to be an integer, and we want a first value which is going to be an integer as well. 
+The first and the skip are going to say, I want to skip the first four items, but I want to bring back four items in total. 
+So that will give us five through eight. 
+I think that's all we need on the backend. 
+Flip over to our front end now, and let's go up to our all items query and actually modify that query. 
+So it's going to be taking in a couple different arguments. 
+First we want to take in a skip argument, which is going to be an integer, and we're going to default that to zero, and then we also want to take in a first argument, which is going to be an integer, and we're going to default that to the per page variable that we have imported from our settings. 
+So let's go ahead and import that right now. 
+Then when we actually run the items query, we need to pass those values to it. 
+So first is the first, the skip is the skip variable, and we also want to pass the order by, which is the created at descending just so that we can get our most recent values that are going to be coming in. 
+Now we'll go down to our actual query, where we have the all items query, and we'll pass some of those variables. 
+So it's a variables-- Variables that we are going to pass, and let's just say skip two, and first four. 
+We'll obviously come back. 
+Now when I refresh this-- Oh, bit of an error here. 
+Let's debug that. 
+Export default imported as per page was not found... 
+Oh, I see what I did. 
+When I imported that per page variable, it's not a-- If I see if I look at the config, you see that it's not a default export. 
+It's a named export so we need to import it as a named import. 
+So, does that work now? Awesome, so now we're getting four items actually in. 
+See, if I were to change this to skip zero, we get four different items. 
+If I were to only ask for the first one, you see we'll only get one item. 
+Then we could just manually change that skip value, and you'll see that we get a different item every single time. 
+So these are sort of the knobs that we're going to be turning, in order to actually figure out what we want to show. 
+So, how do we make these dynamic? Well, the skip value is going to be this.props.page times per page minus per page. 
+And what that will do is-- How many do we want to skip? Well if it's on page one, we want to skip four minus four, meaning we want to skip zero. 
+If it's on page two, two times four is eight, minus four is four! And that's going to give you the-- You're going to skip the first four, which would be for page one, and it's going to show you the next four, which is what we're going to put in here, which is going to be our per page variable. 
+Now refresh, and looks like our items are coming in. 
+I believe we could actually omit this first right here, because that is going to default-- There we go, yeah! We don't necessarily need to, we can just leave it out because it's going to fall back to the four that is in here. 
+There's no need to pass it right there. 
+Now, do all of our pages work? Looks like it's going! Big fan of that. 
+See how nice and snappy that is once-- Go on maybe on the first page, refresh it manually. 
+Now click on the second page; you see it's a slight little delay there while it loads, but then after that it's all instant. 
+And when you're in production, those are going to be pre-loaded, so that when I hit the first page, the next page is already going to be pre-loaded, so that when I click it, it's going to be that instant cut-over that we've really been looking for. 
+Last thing I wanted to say is that, if I were to add a new item now... 
+Let me do that. 
+So, if I were to choose something in here, let's do the Canada goose. 
+Just say just added. 
+But if we go to the home page, it's nowhere to be found. 
+And why is that? Well, that's because the home page was already fetched once before. 
+And now the fact that the home page is updated, then that means page one is out of date. 
+Then that means page two is out of date, and that means page three is out of date! So, we get into this sort of, existential crisis where I don't really know where to... 
+How to actually handle this pagination, 'cause we need something else called cache invalidation, where we actually need to delete the page one and page two and page three pieces of the cache, because now they're all out of date. 
+Now, if I were to add an item to the end, then only pages one and two would be fine, and page three would need to be invalidated and switched out. 
+Or, if I were to delete an item, like right here. 
+If I were to delete this ultra boost, then page one would be out of date, and also page two would be out of date, and page three-- You get the point, right? As soon as you delete one of them or add an item, you're going to make a ripple effect either in front of it or behind it, where all of the other previously cached pages are out of date. 
+So, one way to solve that is you can make your query manually hit the network. 
+So that could look a little something like this, where you could say the fetch policy is equal to network only. 
+And you see now when I hit these items, You see how it's taking a second every single time? That's because it's never using the cache. 
+It's only ever fetching the network-- The network only fetch policy is one way that we could solve that. 
+But that's not great because then you lose all of the benefits of actually using the cache, where every single time that someone hits a page that they've already been on, we need to make a round trip to the server and actually redownload all of that data, right? Another way we can do it; let me comment this out here, is you can use something called re-fetch query, so if we go to our sell page, and we go to our create item component, you remember that we have this mutation here. 
+There's a possibility here to pass it a re-fetch queries, and the re-fetch queries allow us to pass an array of queries that need to then refresh themselves based on the server. 
+So we could pass it the query of our items.js which is our query all items query. 
+The problem is that... 
+Which ones do we tell it? You can't just tell it to refresh all of the items queries, you have to pass it the skip and the first values, and if that's the case then how do you know how many pages there are, and you would have to do a whole bunch of calculations and that's-- You're potentially re-fetching hundreds of pages if you have hundreds of pages loaded into the cache. 
+So, re-fetch queries is not really a good solution either. 
+Really, what the solution would be in this case, is to delete all the items from the cache, and there currently is no way to delete partial items from the cache. 
+Or there's currently no way to set a time limit on the cache items being in there. 
+Maybe like after two minutes, re-fetch them from the thing. 
+I've talked to the developers at Apollo, and they are well aware of this conundrum that you can run into. 
+I wouldn't necessarily call it a bug, but it's a conundrum. 
+It's something that we don't really know how to best solve, and because there is no way to delete part of the cache. 
+There is something that you can delete the entire cache, but that's not a good solution because if we have items in our cart, or we're signed in, or there's orders that we viewed-- Those would all go as well. 
+So, there currently is no solution for it. 
+And, they are planning to introduce something which would allow us to invalidate part of the cache without having to blow the entire cache away. 
+So, just sit on your hands for now because I will be updating it. 
+This is one of the things that kept me from actually recording this course, and there is no good way-- I'm not the only one with this problem, and we will be running-- We will be figuring out how to solve it in the future. 
+Alright, so with that said, we are all in good shape. 
+We have all of our caches, and everything working. 
+Our pagination is working beautiful,
+let's step into the next part of the course.
+
+
 ---------------------------------------------------------------------------------------------------------------
 ------------------------------------- Module 5: Accounts, Authentication and Permissions ----------------------
 ---------------------------------------------------------------------------------------------------------------
