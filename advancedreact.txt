@@ -1327,6 +1327,7 @@ So, I'll see you in the next video where we deal with images
 
 
 ------------------------------------- #18 — Uploading Images (11:46)
+Sign up https://cloudinary.com/
 All right, let's get up and running with uploading some images. 
 In my Node course I showed you how you can use something called a Multer with Express in order to actually upload the images to your own server. 
 So I thought I'd show you something a little bit different in this course and that is uploading to a external service. 
