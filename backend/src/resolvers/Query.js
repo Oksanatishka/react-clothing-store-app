@@ -2,7 +2,8 @@ const { forwardTo } = require('prisma-binding');
 
 const Query = {
     items: forwardTo('db'),
-    item: forwardTo('db')
+    item: forwardTo('db'),
+    itemsConnection: forwardTo('db')
     // this was going to return a promise
     // items(parent, args, ctx, info) {
     //     return ctx.db.query.items();

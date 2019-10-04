@@ -1,0 +1,384 @@
+Fullstack Advanced React & GraphQL https://advancedreact.com/
+
+================ ================ ================ ================  ================ ================
+================ Module 1 - Introduction and Setup (40min)================ 
+================ ================ ================ ================ 
+
+================ #1 — Editor Setup and Starter Files Installation (08:29)
+> git clone https://github.com/wesbos/Advanced-React.git
+> cd Advanced-React/sick-fits/
+> npm install       // in 'frontend/' and 'backend/' folders
+
+================ #2 — Sick Fits and the Tech Stack Behind It (10:30)
+================ #3 — An Intro to Next.js, Tooling and Routing (08:50)
+> cd frontend/
+> npm run dev       // open http://localhost:7777/ in browser
+Create index.js, sell.js under pages folder -> insert React class/function component, Routing with <Link> 
+between these pages.
+
+================ #4 — Custom _app.js Layout (12:25)  
+FRONTEND
+Create _app.js(for some data to show up on each page - to override the App class) under pages folder.
+Create Page.js, Meta.js, Header.js, Nav.js,  under components folder. Insert React Components.
+
+
+================ ================ ================ ================ ================ ================
+================ Module 2 - CSS and Styled Components (51min) ================ 
+================ ================ ================ ================ 
+
+================ #5 — An Intro to Styled Components (11:19)
+Nothing to code. Just play with styled components in Page.js file. For example, add import of it, create button, add styles.
+
+================ #6 — Themes and Layout with Styled Components (18:51)
+Add some styles to Page.js and Header.js. Plus: ThemeProvider, context API.
+
+================ #7 — Global Styling and Typography with Styled Components (10:50)
+Insert injectGlobal styles in Page.js and change the order of imports - external first, then relative imports. 
+Add styles to Nav.js.
+
+================ #8 — Visualizing Route Changes (06:44)
+Add NProgress bar in the Header.js (check Router events in Next documentation).
+
+================ #9 — Fixing Styled Components Flicker on Server Render (04:18)
+Fix unstyled website as you refresh: add _document.js file under pages folder (take it from next doc).
+
+================ ================ ================ ================  ================ ================
+================ Module 3 - Server Side GraphQL (1h 37min)================ 
+================ ================ ================ ================ 
+
+================ #10 — An intro to GraphQL (14:13)
+Nothing to code. Learn what is GraphQL, play with queries in Prisma playground. Check schema(queries, mutatations).
+Resolvers.
+
+================ #11 — Getting Setup with Prisma (22:55)
+Sign up for Prisma Demo Server.
+BACKEND
+
+    > npm i -g prisma
+    > prisma login
+    > prisma init
+    > git status    // 2 files will be created - datamodel.graphql(in my case datamodel.prisma) & prisma.yml
+    
+Rename variables.env.sample to variables.env - never push this file to production, github etc.
+Hide endpoint from prisma.yml to .env file. 
+Add to prisma.yml file: 1) secret - comment it, uncomment when you go to production, 2) hooks.
+     
+    > prisma deploy     // prisma deploy --help, prisma deploy -e variables.env
+    OR
+    > npm run deploy    // it's added script for the command above.
+
+Check Prisma Console - now you should see a new service.
+
+    > git status    // src/generated/prisma.graphql will be modified - all API are created and lives here.
+
+Redeploy after each change in datamodel.
+Now experiment with queries and mutatations in Prisma playground.
+
+================ #12 — Getting our GraphQL Yoga Server Running (22:32)
+Create /src/db.js (check 'prisma-binding' documentation).
+Create /src/createServer.js (check 'graphql-yoga', https://www.prisma.io/docs/1.10/tutorials/build-graphql-servers/development/build-a-graphql-server-from-scratch-nahgaghei6 ).
+Create /src/schema.graphql
+Start server in /src/index.js
+
+    > npm run dev   // turn on debug & playground
+    OR
+    > npm run debug // to start the server (using 'nodemon' package)
+
+================ #13 — Our first Query and Mutation (11:40)
+Nothing to code. Experiment with schema.graphql & resolvers(Query.js, Mutation.js), e.g. dogs.
+
+================ #14 — Items Creation and Prisma Yoga Flow (26:07)
+Make changes in:
+- datamodel.prisma: add 'Item' type.
+- schema.graphql: create method 'createItem' under Mutation, # import * from './generated/prisma.graphql', add Query.
+- Query.js
+- Mutation.js
+
+================ ================ ================ ================  ================ ================
+================ Module 4 - Client Side GraphQL (2h 33min) ================ 
+================ ================ ================ ================ 
+================ #15 — Setting Up Apollo Client with React (11:24)
+FRONTEND
+Check lib/withData.js. 
+Modify _app.js: check doc https://github.com/lfades/next-with-apollo, import ApolloProvider, 
+
+================ #16 — React Meets GraphQL (25:54)
+Create pages/items.js - it's the same as homepage - just import it.
+Create components/Items.js
+Add import of Item.js to index.js.
+Create components/Item.js
+
+Learn: 
+- Higher-Order Components https://reactjs.org/docs/higher-order-components.html
+- Render Props(this time we use it instead of HOC, used in Items.js) https://reactjs.org/docs/render-props.html
+- proptypes (we use it in Item.js) https://reactjs.org/docs/typechecking-with-proptypes.html#proptypes
+
+================ #17 — Creating Items with Mutations (29:50)
+Open (we'll be working on C - create - from CRUD. It's /sell page):
+- sell.js:
+    import CreateItem from '../components/CreateItem'
+- create components/CreateItem.js: writing a mutation and adding a form to add an item.
+    import {Mutation} from 'react-apollo', 
+    import Form from './styles/Form',
+    import formatMoney from '../lib/formatMoney',
+    import gql from 'graphql-tag'.
+
+Learn:
+- external upload APIs, e.g. Cloudinary.
+
+================ #18 — Uploading Images (11:46)
+Cloudinary -> Settings -> 'Upload' tab -> Upload presets: Add upload preset -> type 'Preset name', 
+choose 'Mode: Unsigned', add 'Folder' name, Incoming Transformation (set the width(500), delete height, mode: scale, 
+format: auto), Eager Transformations (set the width(1000), mode: scale, format: auto) -> Save.
+
+Add method called 'uploadFile' to CreateItem component.
+We've got R - read - from CRUD.
+
+================ #19 — Updating Items with Queries and Mutations (25:42)
+We'll be working on U - update - from CRUD.
+
+BACKEND - to update interface
+Open schema.graphql: 
+    - add 'updateItem' to Mutation type, 
+    - add 'item(where: ItemWhereUniqueInput)' to Query(taken from prisma.graphql).
+Open Query.js(resolver):
+    - add 'item' to Query
+Open Mutation.js:
+    - add updateItem to Mutations    
+
+FRONTEND
+- make a copy of CreateItem.js and name it UpdateItem.js.
+Create /pages/update.js:
+    - copy everything from sell.js and paste it in update.js
+    - replace CreateItem with UpdateItem
+In UpdateItem.js:
+    - rename CreateItem to UpdateItem
+    - rename CREATE_ITEM_MUTATION to UPDATE_ITEM_MUTATION
+    - remove uploadFile handler
+    - remove image from fieldset
+    - remove everything from initial state: state{}
+    - create SINGLE_ITEM_QUERY
+    - nest Mutations inside of Query
+
+================ #20 — Deleting Items (13:04)
+Create /components/DeleteItem.js -> rcc (create a new component).
+Go to Item.js -> import that component -> insert it in code instead of button tag.
+
+BACKEND
+Open schema.graphql -> add 'deleteItem' mutation.
+Go to Mutation.js -> add deleteItem
+
+FRONTEND
+Open DeleteItem.js -> add DELETE_ITEM_MUTATION
+
+================ #21 — Displaying Single Items (12:33)
+Duplicate index.js to item.js under /pages. Rename Home to Item.
+Create /components/SingleItem.js -> rcc -> add SINGLE_ITEM_QUERY -> write error checking in SingleItem component. 
+Add styles.
+Change meta title(in web page tab): import /next/Head and insert <Head>Another | Title</Head>
+
+================ #22 — Pagination (15:12)
+Create at least 9 items.
+Create /components/Pagination.js
+
+BACKEND
+Open schema.graphql -> add 'itemsConnection' under Query.
+Open Query.js -> add itemsConnection under Query.
+In playground:
+    query dataAboutItems {
+        itemsConnection {
+            aggregate {
+                count           // will return 9.
+            }
+        }
+    }
+
+FRONTEND
+In Pagination.js make a query PAGINATION_QUERY.
+Open config.js -> you see 'export const perPage = 4;' -> import it into Pagination.js.
+Open index.js -> add <Items page={props.query.page} />
+
+================ #23 — Pagination and Cache Invalidation (09:37)
+BACKEND
+In schema.graphql modify 'items' under Query(add 'where:...').
+
+FRONTEND
+In items.js modify ALL_ITEMS_QUERY.
+
+================ ================ ================ ================  ================ ================
+================ Module 5 - Accounts, Authentication and Permissions (3h 12min)================ 
+================ ================ ================ ================ 
+Creating users, hashing passwords, storing passwords, signing the user in, signing the user up, signing the user out.
+
+================ #24 — User Signup and Permission Flow (23:07)
+BACKEND
+In datamodel.graphql we have User type with id, name, email, password, resetToken, resetTokenExpiry, permissions fields.
+Add:
+    enum Permission {
+        ADMIN
+        USER 
+        ITEMCREATE
+        ITEMUPDATE
+        ITEMDELETE
+        PERMISSIONUPDATE
+    }
+Redeploy after making changes in datamodel.graphql.
+
+Open schema.graphql -> create 'signup' Mutation.
+Open Mutation.js -> create 'signup' resolver -> import bcrypt.js for hashing the password.
+Open index.js -> import 'cookie-parser'.
+
+
+A middleware is a f-n that will run in the middle between your request and response.
+e.g.
+REQ     /dogs.html
+auth
+transform the dogs
+local translate
+
+RES     /[dogs, so]
+
+
+================ #25 — User Signup in React (12:13)
+FRONTEND
+Create /pages/signup.js -> copy code from sell.js and adapt it.
+Create /components/Signup.js -> rcc -> add imports -> return a Form -> add SIGNUP_MUTATION.
+
+================ #26 — Currently Logged In User with Middleware and Render Props (18:44)
+Inspector -> Application tab -> Cookies -> you'll see 'token' and value contains jwt -> https://jwt.io/, insert that token.
+
+BACKEND
+Open index.js
+    - we already did server.express middleware for cookie-parser.
+    - let's build another middleware (to decode JWT), import jwt
+Open schema.graphql
+    - add 'me'(current user) to Query
+Open Query.js(our resolver)
+    - add 'me'
+
+FRONTEND
+Create /components/User.js
+Make changes in /components/Nav.js: add <User> component.
+
+================ #27 — Sign in Form and Custom Error Handling (16:56)
+Cadence: add it to the schema -> add a resolver that's either a query or a mutation, flip over to the frontend,
+build some sort of interface for it, and then manage it from there.
+
+Open schema.graphql:
+    - create 'signin' mutation, 
+Open Mutation.js:
+    - implement the signin.
+    P.S. async signin(parent, args, ctx, info) -> instead of args.email and args.password -> destructure it ->
+    -> {email, password}
+Create /components/Signin.js -> copy code from Signup.js. -> rename SIGNUP mutation and others to SIGNIN ->
+    -> import { CURRENT_USER_QUERY } from './User'.
+Make changes in Nav.js.
+    P.S. instead of wrapping in <div> element a block of <Link> tags -> use React fragments for next <> and </>
+
+================ #28 — Sign Out Button (06:21)
+Steps are the same as in Signup or Signin.
+
+================ #29 — Backend Password Reset Flow (19:59)
+Files to change are the same as in previous tasks. Open schema.graphql: create 'requestReset' mutation..
+
+================ #30 — Frontend Password Reset Flow (14:56)
+Copy Signin and adapt to reset.
+
+================ #31 — Sending Email (12:13)
+You need SMTP account -> we'll use a service called 'mailtrap' https://mailtrap.io/ for testing purpose.
+When you're ready to push your production live, all you have to do is sign up for something like,
+I personally use something like Postmark https://postmarkapp.com/. 
+
+Copy information from SMTP settings to variables.env.
+    MAIL_HOST="smtp.mailtrap.io"  // copy SMTP host here
+    MAIL_PORT=2525
+    MAIL_USER="c41..."
+    MAIL_PASS="0342.."  // password
+
+Create /src/mail.js -> import nodemailer -> add integration.
+
+================ #32 — Data Relationships (05:47)
+Add user: User! relationship to the Item type in datamodel.prisma.
+
+================ #33 — Creating a Gated Sign In Component (05:17)
+
+================ #34 — Permissions Management (22:34)
+Create /pages/permissions.js
+
+================ #35 — Updating Permissions in Local State (12:44)
+
+================ #36 — Updating Permissions on the Server (17:30)
+
+================ #37 — Locking Down DeleteItem Permissions (06:38)
+
+================ ================ ================ ================  ================ ================
+================ Module 6 - Shopping Cart (1h 29min)================ 
+================ ================ ================ ================ 
+================ #38 — Creating our cart in React (05:29)
+
+================ #39 — Apollo Local State Queries and Mutations (12:30)
+
+================ #40 — Server Side Add To Cart (17:04)
+
+================ #41 — Displaying Cart Items and Totals (20:00)
+
+================ #42 — Removing Cart Items (10:45)
+
+================ #43 — Optimistic Response && Cache Updates with Apollo (07:55)
+
+================ #44 — Animating our Cart Count Component (13:20)
+
+================ #45 — Dealing with Deleted Items in CartItems (03:01)
+
+================ ================ ================ ================  ================ ================
+================ Module 7 - Advanced UI and Code Quality (38min)================ 
+================ ================ ================ ================ 
+================ #46 — Cleaning Up This Render Prop Mess (06:20)
+
+================ #47 — Search Dropdown Autocomplete (18:13)
+
+================ #48 — Autocomplete with Downshift (13:08)
+
+================ ================ ================ ================  ================ ================
+================ Module 8 - Credit Card Checkout (1h 19min)================ 
+================ ================ ================ ================ 
+================ #49 — Credit Card Processing with Stripe Checkout (16:45)
+
+================ #50 — Charging Cards on the Server Side (17:50)
+
+================ #51 — Saving Orders to the Database (13:14)
+
+================ #52 — Displaying Single Orders (17:57)
+
+================ #53 — Orders Page (14:19)
+
+================ ================ ================ ================  ================ ================
+================ Module 9 - Testing (3h 20min)================ 
+================ ================ ================ ================ 
+================ #54 — Testing with Jest and Enzyme Introduction (07:44)
+
+================ #55 — Unit Testing 101 (16:30)
+
+================ #56 — Mocking 101 (09:47)
+
+================ #57 — First Tests and Shallow Rendering (14:38)
+
+================ #58 — Snapshot Testing (15:18)
+
+================ #59 — Testing and Mocking Apollo Queries (19:40)
+
+================ #60 — More Apollo Query Testing (20:55)
+
+================ #61 — Testing Pagination (15:18)
+
+================ #62 — Testing Mutations (25:47)
+
+================ #63 — More Apollo Client Mutation Testing (15:21)
+
+================ #64 — Testing our Cart (25:22)
+
+================ #65 — Testing Order Components (15:31)
+
+================ ================ ================ ================  ================ ================
+================ Module 10 - Deployment (28min)================ 
+================ ================ ================ ================ 

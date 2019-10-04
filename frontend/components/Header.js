@@ -55,21 +55,24 @@ const Logo = styled.h1`
     }
 `;
 
-const Header = () => (
-    <StyledHeader>
-        <div className="bar">
-            <Logo>
-                <Link href="/">
-                    <a>Sick Fits</a>
-                </Link>
-            </Logo>
-            <Nav />
-        </div>
-        <div className="sub-bar">
-            <p>Search</p>
-        </div>
-        <div>Cart</div>
-    </StyledHeader>
-);
+const Header = props => {
+    // console.log('Header props', props);
+    return (
+        <StyledHeader>
+            <div className="bar">
+                <Logo>
+                    <Link href="/">
+                        <a>Sick Fits</a>
+                    </Link>
+                </Logo>
+                <Nav />
+            </div>
+            <div className="sub-bar">
+                <p>Search</p>
+            </div>
+            <div>Cart</div>
+        </StyledHeader>
+    );
+};
 
 export default Header;

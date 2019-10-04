@@ -20,14 +20,18 @@ Module 10: Deployment
 ---------------------------------------------------------------------------------------------------------------
 
 ------------------------------------- #1 — Editor Setup and Starter Files Installation (08:29)
-https://wesbos.com/uses/
 
-All React apps are created from template: https://github.com/facebook/create-react-app
+Links:
+--- Wesbos software / hardware for course: https://wesbos.com/uses/  
+--- All React apps are created from template: https://github.com/facebook/create-react-app
+--- Wesbos github: https://github.com/wesbos/Advanced-React
 
+
+Commands:
 // run in both folders - frontent and backend 
 // A package is a folder containing a program described by a package.json file.
 > npm install           // installs a package, and any packages that it depends on (creates node_modules folder).
-// > npm help           // Get help on npm
+> npm help              // Get help on npm
 
 
 ------------------------------------- #2 — Sick Fits and the Tech Stack Behind It (10:30)
@@ -39,7 +43,7 @@ Four main pieces to our application:
         - Styled Components         for styling
         - React-Apollo              for interfacing with Apollo Client
         - Jest & Enzyme             for Testing
-    2. Apollo Client    (Frontend)  For Data Management
+    2. Apollo Client    (Frontend)  For Data Management         // instead of Redux
         - Performing GraphQL Mutations
         - Fetching GraphQL Queries
         - Caching GraphQL Data
@@ -53,7 +57,7 @@ Four main pieces to our application:
         - Sending Email
         - Performing JWT Authentication
         - Checking Permissions
-    4. Prisma           (Backend)   A GraphQL Database Interface
+    4. Prisma           (Backend)   A GraphQL Database Interface        // instead of MongoDB ...
         // CRUD - Create Read Update Delete
         - Provides a set of GraphQL CRUD APIs for a MySQL, Postgres or MongoDB Database
         - Schema Definition
@@ -62,15 +66,19 @@ Four main pieces to our application:
         - Self-hosted or as-a-service
 
 ------------------------------------- #3 — An Intro to Next.js, Tooling and Routing (08:50)
+
+Links:
 https://nextjs.org/
 https://github.com/zeit/next.js/
 
+Commands:
 > npm run dev   // you can find "dev": "next -p 7777" script in package.json
 
 -> Open http://localhost:7777      // you can change the port in the script above.
 -> It's gonna give us a 404 cause we haven't created anything.
--> Create index.js file under pages folder. -> Make a React component. 
+-> Create index.js file under 'pages' folder -> Make a React component. 
     
+    // !! Class component
     import React from 'react';
 
     class Home extends React.Component {
@@ -82,6 +90,7 @@ https://github.com/zeit/next.js/
     export default Home;
 
     OR (the same code):
+    // !! stateless Functional component
 
     const Home = props => (
         <div>
@@ -110,6 +119,7 @@ If you open inspector you'll see a regular <a> tag but it has been bound to HTML
 Next.js by default actually wraps your entire application in what's called an app component. However, sometimes you want to do custom.
 You want to have, like, a custom wrapper component around all of the pages.
 So, in order to do this, you create a custom app. The name of the file is going to be _app.js
+    
     import App, { Container } from 'next/app';
 
     class myApp extends App {
@@ -206,7 +216,7 @@ On https://www.styled-components.com/docs/advanced it's said 'Basically you need
 ---------------------------------------------------------------------------------------------------------------
 ------------------------------------- Module 3: Server Side GraphQL ----------------------------------------
 ---------------------------------------------------------------------------------------------------------------
-------------------------------------- #10 — An intro to GraphQL (14:13)
+------------------------------------- #10 — An intro to GraphQL 
 What is GraphQL?
 GraphQL is a specification built to implement both a server in GraphQL to serve up data as well as 
 be able to fetch that data from the client.
@@ -216,26 +226,32 @@ be able to fetch that data from the client.
     with a GraphQL interface).
     - GraphQL is a SPEC. (So previously what we had for fetching data, we sort of standardized on this, or as far as you can say 
     standardized on what is called JSON APIs where're fetching data from an API. https://api.github.com/users/wesbos .
-    Every single time that you need to learn an API, you need to learn like, okay, how does this API work? 
-    What tokens do I need to specifically pass this API in order for it to work?
-    Do I need to have it as a get request or a post request. If I'm creating an item, is it a post or a put?
-    If I'm deleting an item, is it a post request or delete request? And it gets a little bit confusing 
-    that you have to relearn how APIs work across every single one. Second of all, when I'm hitting this API for GitHub here,
+    Every single time that you need to learn an API, you need to learn 
+        - how does this API work? 
+        - What tokens do I need to specifically pass this API in order for it to work?
+        - Do I need to have it as a get request or a post request. 
+        - If I'm creating an item, is it a post or a put?
+        - If I'm deleting an item, is it a post request or delete request? 
+    And it gets a little bit confusing that you have to relearn how APIs work across every single one. 
+    Second of all, when I'm hitting this API for GitHub here,
     like what if I don't care about any of this stuff? What if I just wanted to get the URL or the type and the name of the person, right?
     Like all this extra data that's coming across the wire is unnecessary or I get into some points about that in GraphQL.
-    So GraphQL is sorta out there to either replace rest or you can also set up a GraphQL server that sits in front of a rest API that will
+    So GraphQL is sorta out there to either replace REST or you can also set up a GraphQL server that sits in front of a rest API that will
     sort of proxy the data in between it. But at the very basics, we need to understand that GraphQL is a specification that's being put out
-    and you can implement this in any language. We're obviously going to be implementing it on our front end with a library called Apollo,
-    and we're gonna be implementing it on the back end with a library called Prisma and another library called GraphQL Yoga.
-    Now I have opened up here, the API end point for my Prisma server. You don't have to do this, but I've just opened it on up
-    and I've also took off the credentials for it. Again, we'll get into this as well.
-    and I just kinda want to show you a couple core ideas behind GraphQL and how it works. 
+    and you can implement this in any language. 
+    
+    We're obviously going to be implementing it 
+        - on our frontend with a library called Apollo,
+        - on the backend with a library called Prisma and another library called GraphQL Yoga.
+
+    Now I have opened up here, the API end point for my Prisma server. 
     So first of all, GraphQL is a single end point that you hit and that's very different than with a rest API
     where you would have many different URLs that you would hit. And if you wanted to grab data from a multiple,
     you'd have to make multiple requests. With GraphQL what you can do is you just have one end point and you send it your query
     and then it will return the data and only the data that you have requested. So here I have an empty thing in Playground
     and I want to query something and I can go ahead and ask for all of the items and on each item I want to ask for maybe the ID
     of the item and maybe the title of the item, and then when I go ahead and run that,
+
             query {
                 items {
                     id
@@ -269,16 +285,17 @@ be able to fetch that data from the client.
     it's just going to return to me the items along with the ID and the title.
     So GraphQL is really cool because your queries essentially look like the JSON of the things that you want and then it just returns you
     the same structure of that data but with the actual values that have been pulled from the database and filled up.
-    That's really cool because I can pull in items, but then if I also wanted to pull in a list of users and their names,
-    I could do that no problem by pulling in items and an array of the actual users that's coming in.
+  
     See how this is just one end point, one request only pulling in the minimal data that I need to pull in for each one.
     It's also self-documenting, which is really cool because actually maybe I should talk about how it's typed real quick.
+
     https://github.com/wesbos/Advanced-React/blob/master/finished-application/backend/datamodel.graphql
     and GraphQL is a typed language, and if you're coming from any background that has a typed language or if you use typescript,
     you probably can skip this part because you understand what that means. But if you are coming from a JavaScript background,
     you'll know that JavaScript is what is called loosely typed, meaning that you can expect a string or a number
     or an object or an array and you can return any value, you can call arguments, you can call a function where maybe you
     are expecting to pass it a number, but you pass it a string, and it's not going to yell at you in any means.
+
     However, with GraphQL, when you define your data, you have to specifically define what type of everything is going to be.
     So like, let's take a look at our items. Our item has a whole bunch of properties in it, like we have an ID and we have a title
     and a description and created at and an updated at and a price and we go ahead and define 
@@ -286,32 +303,19 @@ be able to fetch that data from the client.
     strings, integers, date types, or you can have relationships to others, like this one, an item is created by a user
     and then you have a relationship of a user, which in turn will have a whole bunch of
     other fields, things like an array of permissions or an array of orders or a name or a password or an email address.
-    You sorta get the point that we have it on there. Now, that's really cool because when you make your programming language so strictly typed,
-    you get the benefit of tools being able to analyze your code and provide to you a whole bunch of documentation.
-    So in here, if I'm saying, okay, items I can just hit my control space character on a new line and it will suggest to me
-    what the possible fields are. If this was just a willy nilly JavaScript application,
-    it wouldn't know what the possible returned values are. So I can say, oh, I want to have the description,
-    and then you just run that sucker again and it gives you the description added to that.
+    
     Similarly, you can click on this little Schema tab in the corner here and it's going to show us all of the different queries and mutations.
-    I'll talk about what mutations are in just a second. It shows me all of the different queries that we have.
+    
     So I say, okay, like how do I query, what do I have available to me? I can query orders, I can query cart items,
     I can create different users, I can inquiry either orders, et cetera, et cetera, or I can do the opposite of pulling data,
     which is I want to push data to the server, I want to update data, I want to create new data.
-    And that is what is referred to as a mutation. So GraphQL really just has two things, queries, pulling data, and mutations, putting data,
-    updating data, creating new data, deleting. Anytime you're actually making a change to the data
-    other than just observing it via a query, that is what is called a mutation.
+    And that is what is referred to as a MUTATION. 
+    
+> So GraphQL really just has two things, Queries, pulling data, and Mutations, putting data,
+  updating data, creating new data, deleting. Anytime you're actually making a change to the data
+  other than just observing it via a query, that is what is called a MUTATION.
+
     So now that brings me to my next point of a GraphQL is that these queries make writing relationships very, very simple.
-    So let me get rid of the list of users that I was querying, and right here we're just going to query a list of items.
-    And for each item, you can pull back the ID, and see how I just clicked on that and it opened up the documentation.
-    It says like I can query items by, and these are the arguments that it can give it. So if I only wanted the first three or the last three
-    or wanted to skip the first two and show me the second one, we'll get into that when we do pagination.
-    but then it also tells you the type of item has all of these properties on it, which is pretty neat.
-    So I'm going to close that up. And on each of the items we're just gonna, let's just grab the title, see if it works.
-    Good, and then on there it shows me that I can grab the user. So if I were to grab the user and run it,
-    it's gonna give me an error because it says user must have a sub-selection and that's because there's a relationship here.
-    An item is created by a user. So if I want to know who created that item, I just have to grab the user,
-    and then the way that you query properties of the users, is you just give yourself, and remember it's kind of like JSON,
-    but just without the actual values being returned. So I could say the user name and the user ID. Let's see.
 
             query {
                 items {
@@ -325,18 +329,18 @@ be able to fetch that data from the client.
 
     So the items, here's an array of items.
 
-    GraphQL- The QL stands for query language, but by default GraphQL actually has no, like no filtering, no sorting,
-    they don't have any of the stuff you would assume that you have from like MySQL or something like that.
-    So part of getting over the fact of what is GraphQL is that it itself does not fetch the data and filter the data and provide sorting and all that stuff.
-    GraphQL is simply just a way to vocalize what you want, and then that gets passed to your server and then your server implements
-    these things called resolvers. And resolvers essentially answer the question, how and where do I get this data from?
-    And that's where you end up using your MySQL, or your MongoDB or text-based return of value.
-    That's where you actually handle all of the filtering and sorting and finding of your data.
+> GraphQL- The QL stands for Query Language, but by default GraphQL actually has no, like no filtering, no sorting,
+  they don't have any of the stuff you would assume that you have from like MySQL or something like that.
+  So part of getting over the fact of what is GraphQL is that it itself does not fetch the data and filter the data and provide sorting and all that stuff.
+  GraphQL is simply just a way to vocalize what you want, and then that gets passed to your server and then your server implements
+  these things called RESOLVERS. And resolvers essentially answer the question, how and where do I get this data from?
+  And that's where you end up using your MySQL, or your MongoDB or text-based return of value.
+  That's where you actually handle all of the filtering and sorting and finding of your data.
 
     So GraphQL by itself is not a replacement for these different database things. It's simply just a way to, a standard to
     request a specific data.
 
-    So if I go into this where, and the where will give me a number of options, and again, this is part of what Prisma gives us by default.
+    So if I go into this 'where', and the 'where' will give me a number of options, and again, this is part of what Prisma gives us by default.
     So we want to say like the title is, contains, let's just say Belt. And then for each of those results
     I want to return the title of it and maybe the description. 
 
@@ -353,17 +357,17 @@ be able to fetch that data from the client.
     like myself, from rest APIs, where you have specific APIs, and in this case we only have one API endpoint
     and it's all in the queries and the mutations and how we push and pull data to that API.
     Hopefully that's a nice high-level overview of how GraphQL works.
-    )
 
 
 
-------------------------------------- #11 — Getting Setup with Prisma (22:55)
+------------------------------------- #11 — Getting Setup with Prisma 
 https://www.prisma.io/
 We're gonna start building our GraphQL server that we can interface with our React application.
 We're gonna be using something called Prisma on the back end, and Prisma is a 100% open source library 
 that sort of sits on top of an existing or a brand new database and provides you a full-featured GraphQL API
 that we can use to perform all of our CRUD operations, all of our relationships, all of our data updating,
 everything that we need.
+
 Remember I was showing you in the last video how I was querying and you can write mutations, and you can relate data to one another?
 I hadn't written any code to get that up and running. Prisma does all of the heavy lifting for you
 to provide you with a full featured GraphQL API. Then we're gonna layer on something called Yoga
@@ -374,93 +378,87 @@ Postgres, or MongoDB queries ourself. We're always going to be interfacing with 
 So you can set up your own Prisma instance by using Docker or something like that.
 We are going be using the Demo server from Prisma in the interest of just getting up and running.
 However, do know that you can run your own Prisma, you can run your own MySQL database, and that's likely what you will do
-putting this thing into production. So, first thing we need to do is get you
-actually signed up for Prisma Demo server. So we'll go and click on "Get Started", and you can "open the console".
-It's going to ask you to, or it might not say Open Console, but it might say Sign Up there.
-At the end of the day we just need you to sign up for a Prisma account and log into that thing.
-Then what we'll want to do, when you're logged in you'll probably see nothing here. We want to go over to our terminal and do a little bit of work.
-So, the first thing we need to do is make sure, triple check you're in the back end folder, not the front end folder,
-not just the regular sick-fits folder, the back end folder. Now, inside of that, we're going to globally install Prisma
-'cause Prisma has a command line tool that has some things for sorta bootstrapping our application, and we're gonna be using those.
-So you type, 
-                npm i -g prisma         // i - install, g - global
-Now it's gonna go ahead and install that globally for us.
-Once that has installed, we're going to type,
-                prisma login
-and this is actually kind of a nifty way to log in.
+putting this thing into production. 
+
+1) Sign up for Prisma Demo server (click on "Get Started", and you can "open the console". It's going to ask you to, or it might not say Open Console, but it might say Sign Up there.
+2) Go to the terminal -> check you're in the backend folder -> globally install Prisma ('cause Prisma has a command line tool that has some things for sorta bootstrapping our application, and we're gonna be using those).
+> npm i -g prisma         // i - install, g - global
+> prisma login            // and this is actually kind of a nifty way to log in.
 So you just type prisma login, and it's gonna open up your browser to say Grant Permission, and then you just close the window
 and go back to your terminal and you're authenticated, which I think is pretty cool.
-Then what we want to do is to type 
-                prisma init
-because it's going to sort of follow us through a whole bunch of steps. It's gonna ask us a few questions here.
-1) So, first one, Set up a Prisma, do you want to deploy to an existing server?
-So, you might have an existing database, so if you have a MySQL database or a Postgres database or a MongoDB that you want to connect to, you could do that.
-You could set up a local database using Docker, or you can use either your own hosted endpoint of a Prisma server,
-or you can, in our case, we're going to use the 'Demo server'. So we're going to use our arrow keys to hit enter on that one, then it's gonna ask us,
-2) do we want to put it in the US or the EU. It's kinda cool because it'll show you what the latency is.
-Obviously pick the one that has the least amount of latency for you. I'm gonna use the US since I'm in Canada, nice and close.
-3) Then choose a name for your service, so I'm gonna call mine siccccccccck-fits.
-4) And then you have a stage. So you can have development and production stages, which is kinda neat. I'm gonna leave that at dev.
-5) At this point if you are asked about Prisma Client choose 'Don't Generate'.
+> prisma init
+// it's going to sort of follow us through a whole bunch of steps. It's gonna ask us a few questions here.
+    1. Set up a Prisma, do you want to deploy to an existing server?
+    So, you might have an existing database, so if you have a MySQL database or a Postgres database or a MongoDB that you want to connect to, you could do that.
+    You could set up a local database using Docker, or you can use either your own hosted endpoint of a Prisma server,
+    or you can, in our case, we're going to use the 'Demo server'. So we're going to use our arrow keys to hit enter on that one.
+    2. do we want to put it in the US or the EU. 
+    Obviously pick the one that has the least amount of latency for you. I'm gonna use the US since I'm in Canada, and close.
+    3. Then choose a name for your service, so I'm gonna call mine siccccccccck-fits.
+    4. And then you have a stage. So you can have development and production stages. I'm gonna leave that at dev.
+    5. At this point if you are asked about Prisma Client choose 'Don't Generate'.
 
-// Created 2 new files:                                                                          
-  // prisma.yml           Prisma service definition
-  // datamodel.prisma    GraphQL SDL-based datamodel (foundation for database)      // NOTE: on video it's 'datamodel.graphql'
+Created 2 new files:                                                                          
+1) prisma.yml           Prisma service definition
+2) datamodel.prisma    GraphQL SDL-based datamodel (foundation for database)      // NOTE: on video it's 'datamodel.graphql'
 
 // Next steps:
-  // 1. Deploy your Prisma service: prisma deploy
+  // 1. Deploy your Prisma service: 
+  > prisma deploy
   // 2. Read more about deploying services: http://bit.ly/prisma-deploy-services
 
 P.S. You can see datamodel.prisma instead of a datamodel.graphql. There is no need to make any changes either way.
 
-And there we go, it just created. If I say, 
-        git status
-it's gonna show us that it created just these two files here, and let's actually go ahead and take a look at what those files are.
 
-First let's open this prisma.yml, so open up prisma.yml, and you're going to see there's two pieces of information.
-We're actually going to be modifying this just slightly.  So the first is the actual endpoint that we're going to be hitting,
-and I'm gonna stick that in what's called an environmental variable. And what environmental variables are,
-they allow you to set variables based on the environment. Let's say you have development and then you go to production
-and then maybe you have a staging or maybe you have a different server that you're testing it out on,
-and those things might contain sensitive information or they might just contain values that need to change depending on
-what environment you are sitting in. And it's likely that we'll want to change this endpoint when you switch over to production.
-So what we're gonna do is, we're gonna go to the sidebar here, and you see that we have this 'variables.env.sample'?
-This variables.env file, will, if you open it up, it's going to contain a whole bunch of information, of sensitive information.
-And let me tell you a couple times, do not ever push this variable to anywhere that the public can see.
-So it doesn't go on GitHub, and it doesn't go, and if you look at the gitignore for this file, it'll show you that it's ignoring all .env files.
-But this is just private information that is specific to your deploy and should never be seen by the public.
-So, first thing we want to do is actually rename this from variables.env.sample to just varables.env.
-A lot of people just have it as a .env file.
-And then we want to go ahead and take this endpoint outta here, and stick it into the PRISMA_ENDPOINT.
-And then we'll go back to our prisma.yml file, and we'll interpolate with this syntax, ${env:PRISMA_ENDPOINT (the name of the variable)}.
-Couple other things we want to add to this prisma.yml file. Second, we have this thing called a secret,
-and we will use a Prisma secret, so we'll say PRISMA_SECRET, and what that will do is, it's going to lock down your database
-so that the general public can't just start going and adding and deleting stuff.
-Now, I'm going to make you comment that out for now because what that allows us,
-if you omit the secret then it just makes it wide open, and that makes it really easy for development, but at the huge security concern
-when you actually go to production. So we'll want to uncomment that just before we go to production. So uncomment that.
-We'll go into here and change this secret to something else, 
-Good, and then finally we need something called a post-deploy hook because the way that this is gonna happen is we're gonna modify our data model.
-We're gonna add fields, like things like, we're gonna add the user's email address and the user's password. Those are gonna be fields on the user.
-And then we need to relay that new updated information to our Prisma, which is hosted on the Prisma server.
+Open prisma.yml  -> You're going to see there's two pieces of information.
+    1) the actual endpoint that we're going to be hitting, and I'm gonna stick that in what's called an environmental variable. 
+    
+    Environmental variables allow you to set variables based on the environment. Let's say you have development and then you go to production
+    and then maybe you have a staging or maybe you have a different server that you're testing it out on,
+    and those things might contain sensitive information or they might just contain values that need to change depending on
+    what environment you are sitting in. And it's likely that we'll want to change this endpoint when you switch over to production.
+
+    Find 'variables.env.sample' file. It's going to contain a whole bunch of information, of sensitive information.
+    DO NOT EVER PUSH this variable to anywhere that the public can see.
+    So it doesn't go on GitHub, and if you look at the gitignore for this file, it'll show you that it's ignoring all .env files.
+    But this is just private information that is specific to your deploy and should never be seen by the public.
+    Rename this from variables.env.sample to just varables.env. A lot of people just have it as a .env file.
+
+    And then, take this endpoint outta here, and stick it into the PRISMA_ENDPOINT.
+    And then we'll go back to our prisma.yml file, and we'll interpolate with this syntax, ${env:PRISMA_ENDPOINT (the name of the variable)}.
+
+
+    2) we have this thing called a secret, and we will use a Prisma secret, so we'll say PRISMA_SECRET. 
+
+    It's going to lock down your database so that the general public can't just start going and adding and deleting stuff.
+    Now, I'm going to make you comment that out for now because what that allows us,
+    if you omit the secret then it just makes it wide open, and that makes it really easy for development, but at the huge security concern
+    when you actually go to production. So we'll want to uncomment that just before we go to production. 
+
+    3) Finally we need something called a post-deploy hook 
+    because the way that this is gonna happen is we're gonna modify our data model.
+    We're gonna add fields, like we're gonna add the user's email address and the user's password. Those are gonna be fields on the user.
+    And then we need to relay that new updated information to our Prisma, which is hosted on the Prisma server.
+
 So in order to do that, we need to deploy it, and then after the deploy is done, the Prisma server is actually gonna return to us
 what's called a GraphQL schema. So we need what's called a post-deploy hook in there that will pull that schema for us.
-If this seems a little bit confusing, just hold your horses for just a second, we'll fill it out and then we'll go through it together.
+
 So, our hooks are going to be, and make sure you tab in one level, post-deploy, and then tab in one level, - graphql get-schema -p prisma,
-and that will run it. Let's crack open that other file, which is that data model here. So we have type User, and then that User,
-this is just the default that it gives you. User will have an ID and a name, and obviously we're gonna go and expand this,
+and that will run it. 
+
+Open datamodel file. So we have type User(default). User will have an ID and a name, and obviously we're gonna go and expand this,
 as well as create our new types. But this is the schema of how everything looks.
+
 So what we want to do now is actually deploy this data model to the Prisma server that is running on prisma.io.
-And normally what you'd do is you go to the command line and you type 
-            prisma deploy
-and that's going to take everything in your prisma.yml file and deploy it, but it's going to actually complain to you.
-Warning, a valid environmental variable to satisfy declaration PRISMA_ENDPOINT could not be found.
+
+> prisma deploy     // that's going to take everything in your prisma.yml file and deploy it.
+
+'Warning, a valid environmental variable to satisfy declaration PRISMA_ENDPOINT could not be found.'
 And that's because we are using this alternate naming convention for environmental variables file as variables.env instead of .env.
 And the way you can solve that is just by saying,
-            prisma --help
-and we'll see what all of the Prisma options are. And we want to deploy so I think we can say 'prisma deploy --help'.
-There we go and then it tells us that we can pass a custom path to environmental files, so we can say, 
-            prisma deploy --env-file variables.env
+> prisma --help     // to see what all of the Prisma options are. 
+> prisma deploy --help
+> prisma deploy --env-file variables.env        // pass a custom path to environmental files
 And that should actually work.
 
     I have the following in the terminal:
@@ -508,30 +506,30 @@ And that should actually work.
 
 So what's happening here is it's deploying the service to our sick-fits. It says okay, here are the following changes that you made.
 You created a user, you added the field name, and the ID name and then you also added the updated and created fields to that.
+
 I do get this error right here, "command prepare, blah blah blah". If you get that, it's safe to ignore it.
 I have been in touch with the Prisma folks, and they said that is currently just how it works. It will be removed at a future.
 So even though it's red, it is just a warning, and it's not anything you need to worry about.
+
 Now, if we go back to our Prisma console here, and you refresh, you should now see your sick-fits service showing up.
 And you might have to go to servers first and select either EU or US. I deployed to US so I'm gonna click on that one.
-And you see, here we go, sick-fits, this is our actual database that we've worked on, and you can use this really handy data browser
-where you can see all of the different values that we have. Let me show you the actual finished one that I have here, where I can go to my data browser.
-I can see that there is users. These are all of the users that we have, all of the different cart items, all of the orders that I have created,
-all the items and all of the order items. So go back to Services. One thing you do need to note is that your requests are limited at 10 per 10 seconds, I believe
+And you see, here we go, sick-fits, this is our actual database that we've worked on. 
+So go back to Services. One thing you do need to note is that your requests are limited at 10 per 10 seconds, I believe
 If you do more than that in 10 seconds, then it will just queue them up, and you can queue up to 25 requests. That's not going to be an issue
 when you are in development because you're not gonna be hitting that many. At most we'll be firing off three or four requests per page load,
 and by the time you come back to that, that will have cleared. But, for production, obviously you don't want to be using the Demo server.
 So we've got that up and running.
-One other thing we want to take a look at is, if I take a git status now, you'll see that there's a couple different things that have changed here.
-First, obviously we deleted this variables.env file and renamed it to variables.env. Our Prisma and data model are there,
-but the modified, this is what comes down. Remember when we wrote that post-deploy hook in our prisma.yml file?
-What this does is it goes ahead and gets the schema after we deploy it and we can look at that. It's in the src/generated/prisma.graphql.
-So let's look at prisma.graphql, and this is the magic that is behind all of what Prisma is.
 
-// ??? I don't have this 'modified:   src/generated/prisma.graphql' in the git status.
+> git status        // there's a couple different things that have changed here.
+    1) deleted variables.env file and renamed it to variables.env. 
+    2) created src/generated/prisma.graphql.
+
+    // ??? I don't have this 'modified:   src/generated/prisma.graphql' in the git status.
 
 So it creates this API, and all of the API lives in this prisma.graphql.
 So you can take a look at, we have all our Mutations, createUser, updateUser, deleteUser, upsert, updateManyUsers, deleteManyUsers.
 So we didn't have to create any endpoints or anything to be able to use all of these Mutations.
+
 As well as, this is one thing that's kinda bugging me right now, the syntax highlighting in VS Code is broken.
 There are two syntax highlighters that you could use to highlight it. One is from Prisma themselves.
 It is brand new at the time of recording. However, it has this problem with the broken one. 
@@ -540,6 +538,7 @@ The other one is GraphQL for VS Code, https://marketplace.visualstudio.com/items
 has almost 300,000 installs, and it also has this problem as well.
 This is what comments are in GraphQL is three quotes. So if you are trying to like read this, you can simply just remove it,
 delete the comments, and that's going to actually give you the proper syntax highlighting that we're looking for.
+
 So what else do we have? We have different queries, if we want to query a bunch of users, if we want to query one user, if we want UserConnection.
 We're gonna be using that with our pagination. This will give us information about how many users are there in total, et cetera, et cetera.
 Everything that you could possibly need. See how large this file is? Just for one data model with two fields,
@@ -549,29 +548,27 @@ So, let's actually go ahead and add something. So maybe we'll say we want an ema
 and with GraphQL, the syntax of it is pretty interesting. First of all, the name for these are called fields. This is a type.
 These are called fields. And then you specify the type of that field. And you can say all the different types are,
 let's just go to the GraphQL documentation https://graphql.org/learn/, take a look at what all the different types are.
-// https://www.howtographql.com/
+https://www.howtographql.com/
+
 So we have fields. We're gonna learn about arguments and fragments and directives and all that good stuff coming through.
 But click through to object types and fields and you can see that the built-in ones are
 integers, floats, strings, booleans, ID, and then in addition to that, Prisma will expose a date/time type for us,
 which is automatically added to the user for tracking both when it was created and when it was last updated.
-Similarly, we can also put an exclamation mark on the end and that will make sure that it is required.
-And if you would like an array of strings instead of just one string, you can simply put some angle brackets around it,
-and that would be an array of strings, where each string is not required, but the array itself is required.
-If you wanted both of them to be required, you could put a bang on each of them. But we're gonna back that up
-and just make it a string that is required. These right here, where you have an @, these are called directives in GraphQL,
-and directives can do anything that you want. And they are implemented by your GraphQL server,
-so if we take a look at the GraphQL directive, you can see that we have @name, you have @unique, which is what we're using here.
-You have @relation for setting relations between values. You have defaults, which is used for obviously setting defaults of the value.
-So we're gonna go through some of them. There are some other ones I haven't used in here which is @rename.
-So once we have added the email, Well, we have to go and re-deploy it again, but remember we typed that really long thing,
-prisma deploy env file variables.env? What I've done, if you open up your package.json,
-you're gonna see that I've created npm script called deploy, which will sorta tuck away all of that hard stuff,
-which is prisma deploy env file variables.env. And we can simply just go here and type:
-        npm run deploy
+
+    !,          will make sure that it is required.
+    [],         if you would like an array of strings instead of just one string, 
+    @,          these are called directives in GraphQL, and directives can do anything that you want. And they are implemented by your GraphQL server, you can see that we have @name, you have @unique, which is what we're using here. You have @relation for setting relations between values. 
+    defaults,   is used for obviously setting defaults of the value.
+
+So once we have added the email, Well, we have to go and RE-DEPLOY it again, but remember we typed that really long thing,
+> prisma deploy env file variables.env
+If you open up your package.json, you're gonna see that I've created npm script called deploy, And we can simply just go here and type:
+> npm run deploy
+
 What that's gonna do is it, see, it tells you what changes we had. We created a field email with the type of string.
 It also gives you a link to your GraphQL database endpoint, so you can actually click on that.
 And this is going to give us what is called a GraphQL playground, and this is what I was playing around with earlier.
-        https://us1.prisma.sh/oksana-bibik/siccccck-fits/dev
+https://us1.prisma.sh/oksana-bibik/siccccck-fits/dev
 It allows us to just go into it, so we can look at our schema and see what we have. We have different queries and we have different mutations.
         
         query {
@@ -615,9 +612,8 @@ That's where our Yoga server is going to live.
 
 
 
-------------------------------------- #12 — Getting our GraphQL Yoga Server Running (22:32)
-Now that we have our Prisma database set up we need to work on the GraphQL Yoga side of things. So, Prisma, we give it our data model
-and it's going to create a set of CRUD APIs and if we go to the generated prisma.graphql you'll know that if we'd look at our mutations
+------------------------------------- #12 — Getting our GraphQL Yoga Server Running 
+We give Prisma our data model and it's going to create a set of CRUD APIs and if we go to the generated prisma.graphql you'll know that if we'd look at our mutations
 we have all of these create user, update user, delete user, upsert user, and if we look for the query we get users, user connection,
 and all of the ones that we looked at, right? However, we can't use that directly via JavaScript because there is no sort of security layer,
 there's no authentication layer, and most importantly, there is no layer that we can add on custom logic.
@@ -627,127 +623,101 @@ before we actually save them to that, if we want to have permissions where diffe
 There's a whole section of logic that needs to happen, before that data is actually either pulled from or put into the Prisma DB and that's exactly
 what we're using GraphQL Yoga for. So, we're going to go ahead and do that.
 
-The first thing that we wanna do is create a new file inside of our source directory, I want you to create a db.js file.
-And this is where we're actually going to do the connecting to our Prisma DB, right? 
-So our react JS is going to use Apollo Client to query our GraphQL Yoga end point and then on the server, GraphQL Yoga is gonna connect to
-our Prisma database and pull the data back and forth. Similar to how if we were building like an express application you might have like
-a Mongo DB here (on place of Prisma) and your controller(GraphQL Yoga) is going to query your Mongo DB and then return the data to the client.
+Create a /src/db.js. This is where we're actually going to do the connecting to our Prisma DB. 
+
+ReactJS is going to use Apollo Client to query our GraphQL Yoga endpoint and then 
+on the server, GraphQL Yoga is gonna connect to our Prisma database and pull the data back and forth. 
+
+Similar to how if we were building like an express application you might have like
+a MongoDB here (on place of Prisma) and your controller(GraphQL Yoga) is going to query your Mongo DB and then return the data to the client.
 So, the db.js is what we're going to connect directly to it and that's going to be using something called prisma-binding
 https://github.com/prisma/prisma-binding
-And this is just JavaScript bindings for the Prisma database And it's going to allow us to do things like this where we can connect to a database
-and then we can query things like a user, we can run mutations like a create user, all of the things that we're doing from the playground,
-this is how we're gonna be able to do it in JavaScript. So first thing we're going to do is open that up.
-And we're going to import Prisma from the prisma-binding. 
+
     const {Prisma} = require('prisma-binding');
-You may say, 'Hey Wes. Why are we using require on the server whereas on the front end we're using import?' And that's because at the time of recording
+
+You may say, 'Hey Wes. Why are we using require on the server whereas on the frontend we're using import?' And that's because at the time of recording
 and probably at least for six to twelve more months yet there is no import in Node.js, it's kind of up in the air and
 it's nowhere near production ready. So, on the server we are using require. I know you can use Babel to transpile it 
 or ESM to import it but all that stuff is constantly moving, so we are using the latest standard Node.js and the require.
-So, const Prisma equals require, and then we are going to make our database and we just call a new Prisma from there
-and that will take a couple of things.
+
 
         const {Prisma} = require('prisma-binding');
 
         const db = new Prisma({
-            typeDefs: 'src/generated/prisma.graphql',
+            typeDefs: 'src/generated/prisma.graphql',       // type definitions
             endpoint: process.env.PRISMA_ENDPOINT,
             secret: process.env.PRISMA_SECRET,
             debug: false,
         });
 
-        module.exports = db;
+        module.exports = db;                                //  we need to export this database so that we can pull it into some of our other files.
 
-TypeDefs is one of them, and the type definitions is that generated prisma.graph QL, right? It needs to know what all of the different types,
-queries and mutations are in order to use it. So we have to feed it this Prisma.graph QL file. And that's exactly why we pull it down
-from the Prisma in that post deploy hook is so that we can feed it into this.
-Then we also need to give it access to our Prisma database. And remember, that's in our variables.env file.
-Finally, we need to export this database so that we can pull it into some of our other files. So, say, module.exports is equal to the database.
 
-Next thing that we need to do is we actually need to create the Yoga server. So, I'm gonna create a secondary file in the source.
-We're gonna call it createServer.js. And this is where we're gonna import the GraphQL Yoga server, and if you're wondering
-what GraphQL Yoga is, I know that we explained like why we use it, but GraphQL Yoga is an express server.
+Now we need to create the Yoga server. Create a secondary file /src/createServer.js.
+And this is where we're gonna import the GraphQL Yoga server. GraphQL Yoga is an express server.
 So if you have any other Express middlewares, and we are going to be building some middlewares ourself, you can use all of those, this also sits on top of
 something that's called Apollo server. 
     https://github.com/prisma/graphql-yoga
-So it's built on top of Express and Apollo server. So, it's not instead of using Express or Apollo server.
-But all of these things would be required in order to get a GraphQL server up and running and GraphQL Yoga sort of packs them all into
-one single package, which is fantastic. So, we're going to import the GraphQL server.
-Then we also need to import what are called our resolvers. And resolvers answer the question, Where does this data come from?
-Or, where does this data or what does this data do in the database? And there's two different kinds of resolvers.
-        resolvers
-            - query resolvers
-            - mutation resolvers
-You have query resolvers, which is when you pull data. And you have mutation resolvers, which is when you push data and put it into it.
-So, we have two separate files. One is called mutation.js, and another one is called query.js and any time we want to expose an API,
-and sort of like expose an end point or make people be able to query users, or query items, or add something to their cart,
-or add an item, or delete an item, we are going to write either a query resolver, when someone wants to pull data,
-or a mutation resolver when somebody wants to push data. 
 
-We have our Prisma server which requires it's own type definitions and schema and everything like that, and then
-we also have our GraphQL server which needs it's own schema and type definitions as well.
-So, we're gonna create another file here in our source, and we're going to call that schema.graphql. And this is going to contain all of our
-queries and resolves, and we are going to be able to share some data between Prisma and Yoga, so we're not duplicating ourselves too, too much.
+So it's built on top of Express and Apollo server. So, it's not instead of using Express or Apollo server.
+    - import the GraphQL server.
+    - import what are called our resolvers. Resolvers answer the question, where does this data come from? 
+        Or, where does this data or what does this data do in the database? 
+        And there's two different kinds of resolvers.
+        
+        Resolvers:
+            - query resolvers           , which is when you pull data.
+            - mutation resolvers        , which is when you push data and put it into it.
+
+So, we have two separate files (Mutation.js and Query.js). 
+Any time we want to expose an API, and sort of like expose an endpoint or make people be able to query users, 
+or query items, or add something to their cart, or add an item, or delete an item, we are going to write either 
+a query resolver, when someone wants to pull data, or a mutation resolver when somebody wants to push data. 
+
+We have:
+    - Prisma server     which requires it's own type definitions and schema and everything like that,
+    - GraphQL server    which needs it's own schema and type definitions as well.
+
+Create /src/schema.graphql. And this is going to contain all of our queries and resolves, and we are going to 
+be able to share some data between Prisma and Yoga, so we're not duplicating ourselves too much.
+
 ... Now, so 
-    - we've created our database, 
-    - we've created a function that will spin up a new GraphQL server. 
+    - we've created our database (in db.js), 
+    - we've created a function that will spin up a new GraphQL server (in createServer.js). 
     - We've created our empty schema.graphql.
-A lot of our code is going to do in here in terms of what our client facing types, queries and mutations are going to be.
-And now we actually need to kick start it in our index.js So in the source folder there is an index.js file here.
-We are going to write some code that as, this is going to start up our Node server. So say require. The first thing we want to do is
-make sure that these variables that we put in variables.env,  we wanna make sure that these are available to our application, and this is
+    - In index.js we are going to write some code that as, this is going to start up our Node server. 
+    
+We wanna make sure that these (variables that we put in variables.env) are available to our application, 
 since this is the entry point of our application, this is where we require this variables.env. We're going to require the package dotenv.
 
-We created our database in db.js 
-We made a function called createServer, which will ingest a schema.graphql. And then it will match up everything in the schema
-with either a mutation or a query resolver. We exposed the data base to every single request.
-Again, that will make more sense once we actually hit writing some of these custom resolvers.
-Then, in our index, we spin up a actual version of this GraphQL Yoga server We hold off on the authentication middleware,
-in Express, just for a bit, and then we start it up. So if everything went right, we should be able to,
-Well, let's look at our package.JSON We should be able to run npm run debug or npm run dev
-And let's take a second to unpack all of these server-side, the back end scripts that we have here.
-So, first of all, debug is how we start the actual server. Or start is how you actually start the server.
-I like to use debug locally, and I'll tell you why in just a second. So we're using a package called Nodemon
-and what Nodemon will do is it will monitor your JavaScript files for changes and if there ever is a change in that file
+> npm run debug     // is how we start the actual server. Or start is how you actually start the server.
+or 
+> npm run dev       // It's gonna tell us it's running on local host port 4444.
+
+I like to use debug locally. So we're using a package called Nodemon - it will monitor your JavaScript files for changes and if there ever is a change in that file
 it will kill the server and restart it so you don't have to manually kill it and restart it yourself every single time that you make a change.
 Normally, with Nodemon, you don't actually need to say what file extensions you want to watch,
 but because we also want to kill the server any time we change a graphql file, we specify that.
-The x is what Nodemon should actually be running. And we're gonna run the command node source.index. 
-So we're basically running Node index.js. And then we also pass at this inspect flag Which is going to allow us to use
+> node index.js
+And then we also pass at this inspect flag Which is going to allow us to use
 Chrome dev tools to see our console results rather than just seeing them dumped into our terminal.
 And then, other, we have this thing called playground. And what playground will do is it will open up
 either, it will automatically open up that playground that we were looking at before
-or you can also download the desktop application of GraphQL playground and it will open that up for you. So let's go to our back end here.
-    cd backend
-    npm run dev
+or you can also download the desktop application of GraphQL playground and it will open that up for you.
+> cd backend
+> npm run dev
     
 
-------------------------------------- #13 — Our first Query and Mutation (11:40)
-So, what I wanna do is open up your backend here and I want you to open up your schema.graphql. You see that how we did these two mutations with hi here.
-I also want to go ahead and start this thing up  (npm run dev). It's gonna tell us it's running on local host port 4444.
-I have the GraphQL Playground app installed, you can also just visit localhost:4444 in the browser, 
-Now, what we wanna do now is go back to our schema and we have hi, and you can tell that this is like the shape of our API.
-Anything that you want to be visible via your API goes in your schema and you can see that by going to your actual URL here, 
-clicking on your schema, and you can see that it tells us. These are the queries we have Well, what we could do is start
-to write our own query and mutations. So, if we go to our query here and let's remove hi, and let's just say dogs.
-But because GraphQL is typed, if you want to return a shape of something, you have to go and make that into its on type.
-Now, well what you need to do whenever you create a new query, is you need to set up a resolver. And a resolver answers the question,
-where does this data come from or how do we get it to the end user? So and to do that we open up our Query.js.
-Now remember that when we created our server here, we line up the schema, which is this with a bunch of mutations
-and queries that resolve to the queries and mutations that we have. So, we're gonna open up our query and we're going to say.
-In here you just have to have a method on every single query that lines up exactly with the different queries that we have.
-So, we're gonna make a dogs one and this is just a shorthand syntax for this, so we can just do that.
-Each time that you have a request coming in, it's going to give you this sort of signature of four different variables. 
-First one is the parent and we'll talk about what that is in just a second but that's just the parent schema
-that we have in GraphQL, then we also get arguments that have been passed to the query. We also get the context, which earlier,
-if we can take a look at our createServer again, you see that the context we've given ourself access to the database.
-That's just a way for us to surface the database. Comebacks will also give us the rest of the request as well. 
-So, if we need any request information about the incoming request whether that's headers, or cookies, or anything that's coming in
-that will be available on the context request. And then finally we get this variable called info. And on info we get a whole bunch of information
-around the GraphQL query that's coming in. All of these variables will make sense as we start to us them, but for now, 
-we're actually just going to be returning. Let's just return an array of dogs, we'll say name Snickers. And we'll give ourselves a name, Sunny.
-Okay, that looks good. Now, if that works properly, we should be able to go back here, you can hit this little button here to refresh your schema
-and then if we go to our schema here. You'll see that our queries is dogs and it will return an array of dogs.
-So, we should be able to here and say query, dogs, and from each dog we wanna return, well we only have a name property in there.
+------------------------------------- #13 — Our first Query and Mutation 
+Visit localhost:4444 in the browser.
+Create a new query -> set up a resolver (a resolver answers the question, where does this data come from or 
+how do we get it to the end user) -> open up our Query.js.
+
+Each time that you have a request coming in, it's going to give you this sort of signature of 4 different variables. 
+    1. parent schema        that we have in GraphQL, 
+    2. arguments            that have been passed to the query. 
+    3. context              to access to the database(look at createServer). If we need any request information about the incoming request whether that's headers, or cookies, or anything that's coming in that will be available on the context request. 
+    4. info                 get a whole bunch of information around the GraphQL query that's coming in. 
 
     query getAllDogs {
         dogs {
@@ -763,18 +733,52 @@ So, we should be able to here and say query, dogs, and from each dog we wanna re
 So what we're gonna do next is we're actually going to be interfacing with the database so that when we kill our server 
 and obviously when people on other computers are visiting our website, they're going to be able to access that data.
 
+--> schema.graphql:
+    type Dog {
+        name: String!
+    }
+
+    type Query {
+        dogs: [Dog!]!
+    }
+
+    type Mutation {
+        createDog(name:String!): Dog
+    }   
+
+--> resolvers/Query.js
+    const Query = {
+        dogs(parent, args, ctx, info) {
+            // return [{ name: 'Uff' }, { name: 'Bff' }];
+            global.dogs = global.dogs || [];
+            return global.dogs;
+        }
+    };
+    module.exports = Query;
+
+--> resolvers/Mutation.js
+    const mutations = {
+        createDog(parent, args, ctx, info) {
+            global.dogs = global.dogs || [];    // simply example, never store data in global scope because you'll lose it after refresh
+            const newDog = { name: args.name };
+            global.dogs.push(newDog);
+            return newDog;
+            // console.log(args);
+        }
+    };
+
+    module.exports = mutations;
+
+--->> `datamodel.prisma` vs. `schema.graphql` https://www.prisma.io/forum/t/graphcool-1-0-datamodel-graphql-vs-schema-graphql/2063
 
 ------------------------------------- #14 — Items Creation and Prisma Yoga Flow (26:07)
-Alright, in this video we're going to get the items, both the query for polling items, as well as the mutation for creating items.
-We're gonna get that up and running. I found that when I was doing this whole step, you need to edit like three or four different files.
-    - We need to edit our data model, 
-    - we need to deploy it to Prisma, 
-    - we need to edit our schema to GraphQL for Yoga, 
-    - and then we also need to write a resolver; either in the mutation or the query or both.
+- Edit our datamodel -> deploy it to Prisma, 
+- Edit schema to GraphQL for Yoga, 
+- Wite a resolver: either in the mutation or the query or both.
 
-So, first thing we're gonna do, we're going to open the datamodel.graphql And remember that this is our schema for Prisma
-and then for the database that lives underneath Prisma. And we have our user in here. So we're gonna go down here and
-we're gonna make a new type called Item. 
+1) Open the datamodel.graphql (it's schema for Prisma and then for the database that lives underneath Prisma).
+    - we have user in here. 
+    - make a new type called Item. 
         type Item {
             id: ID! @unique
             title: String!
@@ -786,113 +790,96 @@ we're gonna make a new type called Item.
             // updateAt: DateTime!
             // user: User!
         }
-Now any time that you make a change to what your data model looks like, you have to, have to, have to deploy it to Prisma,
-because we need to update the database to know and to expect both of these items. 
-As well, we also need to pull down our new Prisma schema. So we'll go back to our terminal here,
-and I'm just gonna kill this, and we're going to run 'npm run deploy', and that in turn is going to run Prisma deploy
-with our custom and variable environment file. And you can tell it created an item with all of these new fields on here,
-and then it deployed it up, and it ran our post-deploy hook. Then if we go back to our editor here and open up the prisma.graphql file,
-remember that this prisma.graphql file, this is a generated file based on the datamodel, the schema that we give it,
-it goes and it creates a huge GraphQl file that has all of the relationships, and all of the types, and all of the querys, 
-and all the mutations that are required for our underlying crud api that sits on top of GraphQL.
 
-So what we did earleir, in our datamodel we just had 'type Item', but sometimes you're gonna see this in GraphQL:
-'type Item implements Node', this 'implements Node' is very similar to how in react we extend react.component. 
-So you can create a base node, 'Type node', oh they don't even have it in this file, but it's comething that Prisma creates for you.
-And it's just that base where is has an ID, a createdAt, and an updatedAt value for us. However, if we go down to these mutations here,
-you'lls ee that we now have a new set of apis, which is createItem, there we go. CreateItem: they create their own input types.
-Which is ItemCreateInput.
+        > npm run deploy
 
-Let's go ahead and write our first mutation. So what are the steps to creating a mutation? Well first we open up the schema.graphql.
-Okay, hold on, why are there so many .graphql files, Wes? Well our datamodel.graphql, that's for Prisma, that's for our backend.
-The prisma.graphql is what gets generated based off this datamodel.graphql. Okay these two things are Prisma.
-Now our schema is just our public facing api, because Prisma has access to absolutely everything,
-whereas our schema.graphql is our public facing api, and that is what we're going to be interfacing with our JavaScript.
-Okay so, we can actually just get rid of type dog. We can get rid of this create dog. We can git rid of that here.
-We're gonna go ahead and make a method called createItem, and that's going to take a whole bunch of different arguments in. 
+        In our datamodel we just had 'type Item', but sometimes you're gonna see this in GraphQL:
+        'type Item implements Node', this 'implements Node' is very similar to how in react we extend react.component. 
+        So you can create a base node, 'Type node', oh they don't even have it in this file, but it's something that Prisma creates for you.
+        And it's just that base where is has an ID, a createdAt, and an updatedAt value for us. However, if we go down to these mutations here,
+        you'll see that we now have a new set of apis, which is createItem. CreateItem: they create their own input types. Which is ItemCreateInput.
 
-if it's just the exact same as something that we've generated in our prisma.graphql file, we can import them from that.
-So the way that you do imports in GraphQL currently, it's actually not a standard in GraphQL, there are no imports.
-So Prisma actually uses this thing called GraphQL Import, and it does it via a comment, so this is a little bit weird,
-        # import * from './generated/prisma.graphql'
-And what that's gonna do is it's going to import all of the types and all the inputs from our prisma.graphql, and it's going to make them
-available to us if we then need them. And if we don't use them in our schema it's not going to get imported.
-It will simply just take if from here if we reference it. So by doing that we're able to return a item without actually having the type of item
-to find in this public facing api. However it will then say: Oh, I don't have an item type, I must have to import it from prisma.graphql,
-and then it's gonna go ahead and pull in the value from this generated prisma.graphql.
+2) Let's write our first mutation. Steps:
+    1. open schema.graphql.
 
-Let's just double check that it's working. We'll go to here, our localhost:4444. Refresh the schema, open up the schema,
-and you'll see that our queries, (npm run dev)
+        ** datamodel.graphql,    that's for Prisma, that's for our backend.
+        ** prisma.graphql        is what gets generated based off this datamodel.graphql. These two things are Prisma.
+        ** schema.graphql,       that is what we're going to be interfacing with our JavaScript.
 
-You Might be saying like, okay like, what is the api for our Prisma database, and our api for our Prisma database
-is everything inside of this prisma.graphql. So a quick way to see what all of the api methods 
-are available to us, is you just search for your mutations, and you can see that we have createUser, createItem, updateUser, updateItem, deleteUser, deleteItem,
-- all of these methods are now available to us on our backend because that's exactly what we're interfacing with.
-So we'll go here, and we will take the ctx.db,  so that is how we access our database. Remember earlier when we did createServer
-and we put the database on ctx, but then how we access the database is that we can access it via ctx.db.
-Another way that we could have done that is that is we could have exported the database and then import it into this file, 
-both ways work just fine, but I kinda like  having access to the database inside of the ctx. Then we call either .query or .mutation,
-so in our case we are going to call .mutation, and then we have access to all of the different arguments that we have, so ours
-is gonna be called createItem, 'cause again you can quickly reference your thing here, 
-...args  - and that's the same thing as manually putting each field and value in. We can spread the argument object directly into our data.
-And the reason why we're not just doing this will become apparent because we're also going to have to come back and assign a user to this as well.
-Now one thing we haven't done just yet is that this ctx.db.mutation.createItem, that actually returns a promise,
-and if we want the item to go into the item value then what we need to do is make this an assync method, and then we simply await the
-creation of the item inside of there, and then finally down here we can simply return the item. 
-Another option that we have instead of awaiting the creation and then returning the item, you can simply return a promise
-and it will work just the same way. I like to put it in a variable and then return the item in most cases,
-and that's because if I'm having trouble debugging it I like to go down here and just console.log
-that item as we create it, and that will give me sort of a spot to be able to do that. 
+        - make a method called createItem. 
+            If it's just the exact same as something that we've generated in our prisma.graphql file, we can import them from that.
+            So the way that you do imports in GraphQL currently, it's actually not a standard in GraphQL, there are no imports.
+            So Prisma actually uses this thing called GraphQL Import, and it does it via a comment, so this is a little bit weird,
+                # import * from './generated/prisma.graphql'
+            And what that's gonna do is it's going to import all of the types and all the inputs from our prisma.graphql, and it's going to make them
+            available to us if we then need them. And if we don't use them in our schema it's not going to get imported.
+            It will simply just take if from here if we reference it. So by doing that we're able to return a item without actually having the type of item
+            to find in this public facing api. 
 
-Go back to the terminal, you can type 
-            prisma console
-and that's gonna open up Prisma backend. You can also just log into it, or you might have it open already.
+            Api for our Prisma database is everything inside of this prisma.graphql. So a quick way to see what all of the api methods 
+            are available to us, is you just search for your mutations, and you can see that we have createUser, createItem, updateUser, updateItem, deleteUser, deleteItem,
+            - all of these methods are now available to us on our backend because that's exactly what we're interfacing with.
+
+            ctx.db     is how we access our database. 
+
+            Another way that we could have done that is that is we could have exported the database and then import it into this file, 
+            both ways work just fine, but I kinda like  having access to the database inside of the ctx. 
+
+            Then we call either .query or .mutation,
+            so in our case we are going to call .mutation, and then we have access to all of the different arguments that we have, so ours
+            is gonna be called createItem, 'cause again you can quickly reference your thing here, 
+            ...args  - and that's the same thing as manually putting each field and value in. We can spread the argument object directly into our data.
+            And the reason why we're not just doing this will become apparent because we're also going to have to come back and assign a user to this as well.
+
+            ctx.db.mutation.createItem      returns a promise,
+            and if we want the item to go into the item value then what we need to do is make this an async method, and then we simply await the
+            creation of the item inside of there, and then finally down here we can simply return the item. 
+
+            Another option that we have instead of awaiting the creation and then returning the item, you can simply return a promise
+            and it will work just the same way. I like to put it in a variable and then return the item in most cases,
+            and that's because if I'm having trouble debugging it I like to go down here and just console.log
+            that item as we create it, and that will give me sort of a spot to be able to do that. 
+
+            > prisma console        // and that's gonna open up Prisma backend. You can also just log into it, or you might have it open already.
 
 
 Recap:
-1) when you want to add a new type, you add it to your data model, then we run Prisma deploy to push that up to the Prisma service, 
+1) to add a new type, -> add it to datamodel, -> run Prisma deploy to push that up to the Prisma service, 
 that brings down a new copy of our prisma.graphql, which contains all of our queries and our mutations, and all of the possible, different,
 filters that we could use, 
-2) then we go into our own schema.graphql, which again is our public facing api, this is what our react application is going to interface with,
+2) go into schema.graphql, which again is our public facing api, this is what our react application is going to interface with,
 we can create the ability to create new functions, like create items or query items, then to match up with these mutations and queries,
-3) we go into our mutations and our queries (Mutation.js && Query.js), and we go ahead and write the resolvers to actually complete all the logic that needs to happen,
+3) go into mutations and queries (Mutation.js && Query.js), and we go ahead and write the resolvers to actually complete all the logic that needs to happen,
 and this is exactly where all of our advanced logic, whether it's charging a credit card, or sending an email, all of that is going 
-to be happening in our custom resolvers. So hopefully that makes at least a little bit of sense.
-We're gonna be doing it a couple more times throughout this course, so don't sweat it too much if it doesn't make total sense.
-I found myself that I would need to do it a couple times first.
+to be happening in our custom resolvers.
 
 
 ---------------------------------------------------------------------------------------------------------------
 ------------------------------------- Module 4: Client Side GraphQL ----------------------------------------
 ---------------------------------------------------------------------------------------------------------------
 ------------------------------------- #15 — Setting Up Apollo Client with React (11:24)
-Now anytime you're working with data in a React application you're generally doing one of two things,
-    
-    - you either store all of your data in a component via state, and then if you want that state to be accessible
-    to other components, you either use regular state, and if you want that data state to be available
-    to other components, you either put it in a context or pass it down via probs, or as that starts to get
-    a little bit unruly, you usually reach for something called Redux and Redux is a data store
-    where you can define what your actions are and how those actions are handled and how the data goes in and out and whatnot,
-    
-    - and Apollo Client will replace the need for using something like Redux in fact Redux was used under the hood
-    in Apollo for version one, now it's in version two and almost version three. So we don't need to use Redux in here
-    because Apollo does all of the data manager stuff that a Redux store will do, as well as a whole bunch of other stuff.
-    So it will do 
-            - the fetching of the data from the serverside, 
-            - the pushing of the data to your mutations
+
+Common Options for Managing Data in a React application (http://www.react.express/data):
+1. Component State
+2. Redux
+
+Apollo Client will replace the need for using something like Redux. It will do: 
+    - the fetching of the data from the serverside, 
+    - the pushing of the data to your mutations
             - all the caching so if I request a resource twice in the same page, or request it once and then 10 minutes later request the same resource it's going to pull it from the cache first.
             You don't have to worry about whether you should pull that over the network or not, it will help us manage our local states, so if you have data that just stores
             in the browser we can do that. And it also gives you your error in loading UI states which is fantastic, you never have to set a flag
             of is loading true or you never have to manually catch your errors because it will do all of that for you.
-    So Apollo does a whole bunch of stuff for you and it's really awesome, it's sort of the gold standard for working with GraphQL in React world.
+    
+    So Apollo does a whole bunch of stuff for you, it's sort of the gold standard for working with GraphQL in React world.
     There is another package from Facebook that is called Relay and I'll let you do your own research into that.
-    It's a little bit more low level, whereas Apollo Client is up and running really, really quickly but that's not to say that Apollo Client is less powerful.
+    It's a little bit more low level, whereas Apollo Client is up and running really quickly but that's not to say that Apollo Client is less powerful.
     I have yet to run into any huge show-stopper issues with Apollo Client so, really excited about it.
 
-First thing we want to do is open up this withData.js.
+Open withData.js.
 
-    1) First thing we need to do is import the Apollo Client from something called apollo-boost. What apollo-boost is is a package
-    that is put out by Apollo, it's an official package that has all of the standard things that you would want to use with
+    1) import the Apollo Client from apollo-boost. 
+    apollo-boost is an official package that has all of the standard things that you would want to use with
     an Apollo installation in the client included. By default Apollo Client just comes as Apollo Client,
     https://github.com/apollographql/apollo-client/tree/master/packages/apollo-boost 
     and then if you want to add anything to maybe deal with caching or to deal with Ajax calls to your serverside, or to handle errors
@@ -900,116 +887,99 @@ First thing we want to do is open up this withData.js.
     However in most cases most people will want to use all of these things so they put out this package called Apollo Boost 
     and it has these things pre-configured for you which is fantastic.
 
-    2) Next thing we need is withApollo from this package called next-with-apollo what that does is it's going to give us
-    a high-order component that will expose our Apollo Client, Apollo Client is the data base that is in the client,
-    and it will expose that client via a prop. ReactApollo actually comes with some tools for doing this
-    however because we are using next.JS and we want serverside rendering to work, there's a little bit of extra work that we need to do
-    because of how serverside rendering works. This package does all of that for us which is great, and then 
+    2) we need withApollo from package called next-with-apollo 
+    it's going to give us a high-order component that will expose our Apollo Client, 
+    Apollo Client is the data base that is in the client, and it will expose that client via a prop. 
+    ReactApollo actually comes with some tools for doing this however because we are using next.JS and 
+    we want serverside rendering to work, there's a little bit of extra work that we need to do
+    because of how serverside rendering works. 
     
-    3) I've just imported the endpoint from our config.JS which just shows us where our actual API is being,
-    this is our Yoga API right here, 4444. 
+    3) import the endpoint from config.JS which just shows us where our actual API is being, this is our Yoga API right here, 4444. 
 
-    4) Then what we do is we create a function that takes in some headers and that's going to be very important
+    4) create a function that takes in some headers and that's going to be very important
     when we get into our authentication stop and we return a new client from it and then we give it the url of our end-point.
     In this case I'm always just giving it that local host 4444 but we could change that out when we go to production
     and then what we do here is on every single request that happens this is sort of like an express middleware here.
     We are including our credentials. Again what that's going to do is that when you make a request if we have any logged in cookies in the browser
     then those cookies are gonna come along for the ride and that's important when we flip over to our back end. 
 
-    5) Finally we export this with Apollo we give it a function to create a client and then we're gonna actually create a client 
+    5) export this with Apollo we give it a function to create a client and then we're gonna actually create a client 
     in our app.JS so let's jump over to there. We're gonna do all of that ourselves.
 
-_app.js
-    1) We want to import the ApolloProvider from the react-apollo package. And then we also want to import the withData method
-    that we just made from go up a level, into the lib folder and into the withData. 
-    Then all you need to do in order to expose a Apollo Client to a React application is just wrap the application
-    in what's called an Apollo Provider. I'm gonna go in-between container and page. Page is like the highest level that we have.
-    So what we're gonna do is we're gonna wrap each and every page in that and we'll say ApolloProivder.
-    Wrap that there and then the Apollo Provider needs a client which is our Apollo Client accessible to it.
-    Let's say client is equal to and that is available via this.props.apollo and why is that available to us?
-    Well because we're gonna go down here to when we export it, remember I said that this with data is gonna be a high-order component.
-    What we're gonna do is we're gonna export this app and we're gonna wrap it in our withData function 
-    and that's going to make the Apollo Client accessible via this.props. What I like to also do is not to type this.props
-    out of Apollo but we can destructure it up here. So let's say, component, Apollo. Then we also need to do a little bit of work
+Open _app.js
+    - import the ApolloProvider from the react-apollo package. 
+    - import the withData method that we just made from go up a level, into the lib folder and into the withData. 
+    In order to expose a Apollo Client to a React application - wrap the application in an Apollo Provider. 
+        - Go in-between container and page. // we're gonna wrap each and every page in ApolloProvider.
+        - Apollo Provider needs a client which is our Apollo Client accessible to it.
+            client=this.props.apollo 
+    - export this app and wrap it in our withData function and that's going to make the Apollo Client accessible via this.props. 
+    
+    What I like to also do is not to type this.props out of Apollo but we can destructure it up here. 
+    So let's say, component, Apollo. Then we also need to do a little bit of work
     in order to expose page numbers. When we go to different pages on our application we are going to need to surface those page values
     so anytime I go to like /item you see page two. (e.g. localhost:8888/items?page=1)
-    Or /itemsingular, id equals one, two, three. We need to surface those values. In previous versions of Next.js
-    they would automatically do this but now we have to explicitly do that so what we have to do is go up here
-    and write ourselves a static getInitialProps which is going to pass us the component and the context 
-    say let pageProps is equal to curly bracket and then we'll say if the component that we're trying to render has some props
-    then we are going to surface those via the page props. So pageProps is equal to await, Component.getInitialProps.
-    And you pass it the context and what we need to do is mark this as async, and finally what we'll do here is we'll say pageProps.query
-    is equal to ctx.query that is how we, let's write a little comment there. This exposes the query to the user.
-    Then we'll return pageProps. 
-    Then down here what we'll do is we'll destructure that, pageProps. You may be thinking how did I just go from pageProps here to here,
+    Or /itemsingular, id equals one, two, three. We need to surface those values. 
+    - write a static getInitialProps which is going to pass us the Component and the context 
+    
+    - destructure pageProps. 
+    You may be thinking how did I just go from pageProps here to here,
     that's because this getInitialProps that's a special next.JS lifecycle method. This will run first before the first render actually happens.
     And by returning anything here you expose it via Props down here and that's gonna be really important because what this all does in here
     where we say Component.getInitialProps is every single page that we have it's going to crawl the entire page for any queries or mutations
-    that we have inside of that page that need to be fetched. We have a list of items and a shopping cart and a couple other queries on the page.
+    that we have inside of that page that need to be fetched. 
+    We have a list of items and a shopping cart and a couple other queries on the page.
     All of those queries need to be fired off and resolved before we can actually go ahead and render out the page.
     By doing this right here, it's going to crawl all of those pages for us, fetch all that data and then return all of that data to this.
     It's a little bit confusing to me but this isn't necessary if you're just doing a client rendered app, it's just because of the way that
-    serverside rendered applications work. Where does all of this code come from? If you go to the next JS or the Apollo documentation
-    they all have examples of how to get it working with server-side render and there's lots of examples that look a lot like this. 
+    serverside rendered applications work. 
+    
+    Where does all of this code come from? 
+    If you go to the nextJS or the Apollo documentation they all have examples of how to get it working with server-side render and 
+    there's lots of examples that look a lot like this. 
+
     So we have these page props, we're going to go into the component down here and we're just going to spread those
-    on down to the component for that specific page. Now, if that works let's actually fire up our client, so I'm gonna go over here, 
-            npm run dev
+    on down to the component for that specific page. Now, if that works let's actually fire up our client,
+    > npm run dev
     and it seems like everything's working. Open Console - everything's working too.
-    One thing I do recommend getting is the Apollo dev tools for either Firefox or Chrome so just do a quick search
-    for Apollo dev tools and what that's going to do is it's actually gonna give us access to our entire store or the cache as we say it,
-    there's nothing in here yet but if I were to go to this one, and open up my Apollo cache here, you can see that I have got my cart items in here,
-    I've got all of the different items, I have all the different orders that I have and the specific user as to who I am right now.
-    You can see all of the different permissions and orders and name and id and the e-mail that I have. This is kind of like React dev tools
-    where it's going to allow us to peer into what the cache actually looks like right now, in case we're running into any caching issues.
+
+    Get 'Apollo dev tools' for Chrome.
+    It's going to allow us to peer into what the cache actually looks like right now, in case we're running into any caching issues.
     https://chrome.google.com/webstore/detail/apollo-client-developer-t/jdkknkkbebbapilgoeccciglkfbmbnfm?hl=en-US
 
-    So that is a little bit of boiler plate that we need to get this Apollo up and running.In the next videos we're actually gonna be writing some code
-    that we can fire off some queries and start pulling data into our application so we can template it out with React.
 
+------------------------------------- #16 — React Meets GraphQL 
 
+Create /pages/items.js. 
+    import Home from './index';
+    export default Home;
+P.S. We can reuse the same page from multiple pages by importing that and then exporting it immediately.
 
-------------------------------------- #16 — React Meets GraphQL (25:54)
-All right, now we're going to get into the React side of things where we're gonna be writing queries to both pull down a list of items, to update items,
-to add new items, to delete items, we're gonna do the whole crud of our items, and then we'll sort of go back and forth 
-and do that throughout the rest of the course  with orders and cart and buying things and charging credit cards and sending email
-and all that good stuff. So let's get up and running. Just to show you real quick, the homepage is going to be the list
-of the four most recent items, and then when you click on shop it's gonna bring us to /items, and it's also going to be,
-so these are gonna be the exact same page, and then as we go through to page two, it's gonna be the items page with a query param of page two
-being passed over there. 
+Open up index.js (homepage)
+- remove this link tag. 
+- create a component that's called Item.
 
-So, actually what we wanna do is open up index.js, which is the homepage. And we wanna go into our pages folder
-and we're going to make a new file called items.js as well. And all we're going to do is import Home from index. And then export default Home.
-So the way that we can reuse the same page from multiple pages is simply just to import that and then export it immediately.
-And if we go to our application now and we go to items. Actually, what did we call it here? We called it shop. Let's change that real quick.
-We'll go to nav.js, and let's call that shop.
-Now what we're gonna do here on our index.js, we can actually remove this link tag here. We're going to create a component that's called item.
-So go into your components folder, make a new file called the Items.js. Gonna scaffold out a component rcc tab, there we go.
-And we create a component called items. Now we are importing React and the component. We also need to import query from React Apollo,
-'cause that's what's going to allow us to actually query data directly into this component, and then let's just give ourselves a div inside of that,
-just paragraph, say items. 
-Now we'll go back into our index.js and import that items. 
-We can double check in our React dev tools that our items is there, beautiful. That's our component.
+Create /components/Items.js -> rcc.
+- create a component called Items. 
+- import React and the component.
+- import query from React Apollo.
 
-Now most of our work is going to be done in the items.js. I can close down any other files that we have.
-All right, so first thing we wanna do is let's just get some data on the page and learn how to actually query some stuff
-from our Apollo store before we can get into styling and looping over and what not. 
-The first thing that we need to do is write a query. And the way that you can write a query in this is by using the GraphQL tag.
-So we will import gql from GraphQL tag. And then we are going to make a query. Now there's a couple options that we have here.
-Some people like to put their queries in a separate file and leave them in a queries file and then import them into that file as you need it,
-or what I like to do, and this is what comes recommended from the Apollo devs, is that just locate the queries in the actual files where you're going
-to be doing the querying, and then if you need to access that query in multiple files then you can just export it from one of those
-and import it into the rest. So, that's exactly what we're gonna be doing. I'm a big fan of just putting everything in the same file
-until it becomes a problem and then refactoring it out. So say const ALL_ITEMS_QUERY, and it's sort of a best practice
-to put all of your queries in caps. And we say = gql back text. So this works the exact same way that style components works
-is that we write our queries in a string and then you just tag it with a gql. So make sure that you use back ticks here.
-And then in here we just write the query. We are going to name all of our queries, and what I like to do is name them the same thing
-as the actual variable that it lives in, just for your own sanity's sake, because then you're gonna be having query variables, 
-you're gonna be having names of queries, and then you're also going to have the name of the query or the mutation that's on the client side,
-and it can get out of hand real quick. So we're going to call it ALL_ITEMS_QUERY, and then inside of that we simply just start
-to write the query as if we were doing it in the playground. So we're gonna say we want the items and for all of the items we want to pull the ID,
-the title, the price, the description, the image, and the large image. So we have listed out all of the fields that we want to return.
-Remember with GraphQL you only pull in exactly what you need. If there's anything in that item that you don't necessarily want,
-you leave it off your actual query. Now the way that we use this query is via something called a Render Prop. We previously had imported this query,
+Open index.js and import that items. We can double check in our React dev tools that our items is there.
+
+Open items.js.
+- get some data on the page and learn how to actually query some stuff from our Apollo store before we can get into styling and looping over and what not. 
+- write a query by using the GraphQL tag (import gql from GraphQL tag). And then we are going to make a query. 
+
+Now there's a couple options that we have here.
+    - Some people like to put their queries in a separate file and leave them in a queries file and then import them into that file as you need it,
+    - or what I like to do, and this is what comes recommended from the Apollo devs, is that just locate the queries in the actual files where you're going
+        to be doing the querying, and then if you need to access that query in multiple files then you can just export it from one of those
+        and import it into the rest. I'm a big fan of just putting everything in the same file until it becomes a problem and then refactoring it out. 
+
+    const ALL_ITEMS_QUERY  // it's sort of a best practice to put all of your queries in caps. 
+    // write the query.     // We are going to name all of our queries, and what I like to do is name them the same thing as the actual variable that it lives in, just for your own sanity's sake, because then you're gonna be having query variables. Remember with GraphQL you only pull in exactly what you need. If there's anything in that item that you don't necessarily want, you leave it off your actual query. 
+
+Now the way that we use this query is via something called a Render Prop. We previously had imported this query,
 and that's actually a component in itself. So previously in versions of React Apollo, or you may have used other libraries, 
 they use what's called a high-order component where when you export this item, maybe you would take that off, and you'd say export default Items.
 Then what would happen is you would make a function that was called like withItems, and then you would wrap your component
@@ -1017,34 +987,11 @@ with this high-order component, and then that would expose a list of items via a
 And then if you had multiple you could compose multiple. That's how redux works. However, what's becoming more popular now
 in the React world is something called a Render Prop where you don't have to mess with high-order components,
 you simply just put a component inside of here that is a query and then the child of that component is going to be a function that gives you
-either loading state, an error, or the actual list of items itself. Now, this can get a little bit hairy with all of the curly brackets and what not,
-so stick with me and we'll show you one quick example. I find that most people's initial reaction to Render Props are that they don't like it.
-But I do find that after a while I start to like it, or maybe I'm just drinking the Kool-Aid. So this is the recommended way to do it via Apollo.
+either loading state, an error, or the actual list of items itself. 
+
 Apollo does also have a high-order component. But at the time of recording, they are really pushing the Render Prop
 as well as you don't get the error and loading states with mutations on high-order components. That's another reason to go Render Prop.
-So we're gonna go down here, and we are going to give ourselves a query component. Then the query component takes a query prop itself,
-and then you pass it the, you pass it the name of your query. So our's is called ALL_ITEMS_QUERY, then inside of your actual query,
-you don't just go ahead and start like giving yourself a paragraph tag or something like that. You must, the only child of a query component,
-must be a function. So the way that we do that in React, and this is where it starts to get a little bit hairy, is you give yourselves a set
-of curly brackets to note to React that. Okay, now I'm switching from JSX land over to JavaScript land. And then inside of that we write a function
-where it gives us a number, like what's called a payload. So we give it an arrow function. Let's just do that right now. 
-And then that arrow function gives us a payload. And then inside of here we can go ahead and let's just console.log the payload,
-and then from this we need to return some sort of JSX that will be rendered as the child. So return a paragraph that says,
-hey, I'm the child of query. Give that a save. You see how my, oh I got an error but, you see how it took off the,
-I had the parentheses here and then as I save it that's just my prettier saying, okay, if you only have one argument of an arrow function,
-it's not necessary. If there was two things, like another one, it would not actually remove those, but that's just a prettier setting that I have
-that will automatically format them. So we got a little bit of an error here, what have we got here? Check the render method of items.
-Element type is invalid. Expected a string for built-in components or a class function for composite components but got undefined.
-Okay, so let's take a look here. So I just stopped for a second to try to debug what was going on and it turned out that I just had to refresh the page.
-Sometimes the hot reloading can get into a weird spot where it catches an error and is not able to recover itself. 
-So if you ever do get into one of these errors just give your page a refresh and see if that's what it is first. So here we have query.
-We're running it, we should now see in the console a payload, ho ho, there we go. This is our payload and what's inside of it?
-Well there's tons of stuff inside of here. There is some methods for refetching that query. There's some methods for polling
-where you could poll it every however many seconds and kind of get like semi-real time data. 
-Apollo also has the ability to do real-time data as well. You get access to the client. This is the actual Apollo client itself.
-That's where all the data is stored. But the things that we are interested in here is three things, data that contains an array
-is three things, data that contains an array of the return data from our query. In our case we just asked for items. 
-So it's returning just those items. And you can see that the two of our items are in there. That's good.
+
 Error undefined, so if something went wrong here, then it would actually return us an error, and then the loading is going to be either true or false,
 and what that will do is this little Boolean will flip to true when it is doing some sort of work, and in most cases this is always going to be false
 because we are server side rendering, so it's gonna wait until that is flipped over to true, but we will be using that quite a bit on the client side.
@@ -1075,7 +1022,7 @@ We're gonna loop over and remember this is how you loop over items in React. You
 and for each item in the array, we're going to return something else. So let's just say, let's just do a paragraph tag for now,
 and we'll interpolate the item.title. We've got our items showing up. Doesn't look like they're beside each other.
 
-So go under component, so create a new file called Item.js, and we will say rccp. What that does is it imports React
+Сreate Item.js -> rccp. What that does is it imports React
 as well as a prop-types package, and on that we are going to say the one prop type that we are expecting is called item.
 We are going to say PropTypes.object.isRequired. You can go a little bit further with that instead of using object because it could be any object.
 You could shape that object by saying PropTypes.shape. And inside of that you could say it needs a title,
@@ -1103,28 +1050,22 @@ and you can always investigate those packages yourself.
 
 
 ------------------------------------- #17 — Creating Items with Mutations (29:50)
-All right, we are going to be doing the C part of CRUD, which is we're actually going to be creating an item, and then we're going to be doing
-that via the sell page, where we have a little form here that takes in a title, a price, as well as a description 
-for the item, and then you can also go ahead and upload an image. We're gonna hold on the image part until the next video
-and that's where we're going to learn how to interface with external upload APIs. Specifically, we're going to be
-using one called Cloudinary. So, open up your sell.js file and then also open up-- 
-Or actually, we have to create this ourselves. Go into your components folder and make a capital C, capital I, CreateItem.js and we will scaffold
-out a little react component there-- RRC, oh, that's for redux. RCC. I also like to export them at the bottom.
-We also need a couple more things to import here. We're gonna import the mutation component from react-apollo.
-That's going to allow us to actually push data. Remember query mutation. Query is when you pull data, mutation is when you push
-and actually make it change. We are also going to import the form tag from our styles. We are also going to import the form tag from our styles.
-So, import form from styles/Form, capital F Form. We need that formatMoney function that we've used before
-and we also need GraphQL, GQL. So, input gql from graphql-tag. And we got couple more things we want to import
-But let's pump the brakes on importing things until we actually need it so we can actually understand what they do.
-So first thing: let's just render out a form tag, capital F Form, and inside of that, give yourself an H2 that says sell an item.
+C part of CRUD - creating an item via the sell page, where we have a little form here that takes in a title, a price, as well as a description 
+for the item, and then you can also go ahead and upload an image. 
+Open sell.js 
+Create /components/CreateItem.js -> RCC
+    - import the mutation component from react-apollo.
+    - import form from styles/Form
+    - We need that formatMoney function that we've used before
+    - we also need GraphQL, GQL - gql from graphql-tag
 
-Okay next, what we want to do is I actually want a fieldset and I'll explain why I want a fieldset in just a quick second.
-And then, inside of that we need a bunch of inputs. Let's take a look at here. So, first one is for title.
-I'm going to have it label and I'm going to call that title. So we use htmlFor in React instead of regular for,
-just because for is a reserved word in JavaScript. So they use htmlFor, so that's for title. Then I'm going to do my title, there.
+So first thing: let's just render out a form tag, capital F Form, and inside of that, give yourself an H2 that says sell an item.
+Okay next, what we want to do is I actually want a fieldset.
+And then, inside of that we need a bunch of inputs - title.
+So we use htmlFor in React instead of regular for, just because for is a reserved word in JavaScript. 
 And then we want to input type of text, id of title and name of title, placeholder of title, a required attribute. 
 Now, let's talk about where the data is going to come from.
-This CreateItem is going to have a local state inside of it. And this is kind of cool because you might think,
+This CreateItem is going to have a local state inside of it.
 "Oh we're using Apollo, we have no need for state." But state is really helpful for when you want to just contain data locally within a component.
 And before we actually send all the data to our GraphQL API, we need to store it somewhere, right?
 So we're going to be temporarily storing that in state. So we're actually gonna go up here, State is equal to, and our state is going to have
@@ -1493,10 +1434,10 @@ the name or the description of one of our items.
 
 
 ------------------------------------- #19 — Updating Items with Queries and Mutations (25:42)
-Alright, we're gonna get into the U of CRUD and that is the update. 
-So, a couple things we need to do is we need to first jump into our back end and update the interface for that, and then we'll come back into the front end and actually write the interface for doing that. 
-So, flippin' over to pink, which is back end, and we are going to first open up our schema at graphql. 
-There's gonna be kinda two things that we need here. 
+U of CRUD - update. 
+Jump into our back end and update the interface for that, and then we'll come back into the front end and actually write the interface for doing that. 
+Open up our schema at graphql. 
+
 First, we're gonna need a query for a single item. 
 And that's gonna allow us to click on Edit and pull the existing information about that item. 
 And then second we're gonna need a mutation that will actually handle the updating of the item. 
@@ -1816,9 +1757,7 @@ Let's flip over to working on the pagination.
 
 
 ------------------------------------- #22 — Pagination (15:12)
-Alright, now we're gonna be working on Pagination, so what I want you to do, is make at least nine different items in here, and then I'll meet you back here when you've got your nine items. 
-Alright, I've added a couple now, I just want to show you one little problem that we're gonna be running into. 
-If you click on your homepage after you've added something, you might not see all of the items that you've added. 
+Create 9 items. If you click on your homepage after you've added something, you might not see all of the items that you've added. 
 I just added the denim here, and it's not showing up, until I actually refresh, and that's actually a problem because the cache is caching all of the items, and when we go back to the homepage, it goes, oh, I already have that query. 
 So, we're gonna need to look at how we can actually invalidate that query, and there's a couple of options that we can do. 
 Also, there's gonna be some stuff coming to Apollo fairly soon, and I'll make sure to update these videos once they actually are in Apollo, because right now, it's a bit of a problem. 
@@ -1917,50 +1856,23 @@ to actually take the page number into account.
 ------------------------------------- #23 — Pagination and Cache Invalidation (09:37)
 In the last video, we did this little pagination, where you can click back and forth but it doesn't actually affect the items. 
 So that's what we're going to be doing in here. 
-First thing we need to do is flip to our backend, and open up our schema out of graph.ql, and we need to be able to modify this item's query here to take a couple of arguments 'cause right now, all the items query does is it just returns you a list of all of the items and there is no way to tell you how many you want, which ones you want... 
+
+Backend
+Open schema.graphql, modify this item's query here to take a couple of arguments 'cause right now, all the items query does is it just returns you a list of all of the items and there is no way to tell you how many you want, which ones you want... 
 What are the different arguments that you want to pass it, so we're going to modify that here. 
 It's gonna take in a number of different arguments. 
-First one is going to be where, in case we want to be able to do searching, which we will. 
-It's going to be item where input, then we also want to have order by; if you want to order them by most recent or least recent-- So item order by input; we want to have a skip value, which is going to be an integer, and we want a first value which is going to be an integer as well. 
-The first and the skip are going to say, I want to skip the first four items, but I want to bring back four items in total. 
-So that will give us five through eight. 
-I think that's all we need on the backend. 
-Flip over to our front end now, and let's go up to our all items query and actually modify that query. 
+    - It's going to be item where input, 
+    - then we also want to have order by; if you want to order them by most recent or least recent-- So item order by input; 
+    - we want to have a skip value, which is going to be an integer, and we want a first value which is going to be an integer as well. 
+The first and the skip are going to say, I want to skip the first four items, but I want to bring back four items in total.  So that will give us five through eight. 
+
+Frontend
+Go up to our all items query and actually modify that query. 
 So it's going to be taking in a couple different arguments. 
-First we want to take in a skip argument, which is going to be an integer, and we're going to default that to zero, and then we also want to take in a first argument, which is going to be an integer, and we're going to default that to the per page variable that we have imported from our settings. 
-So let's go ahead and import that right now. 
-Then when we actually run the items query, we need to pass those values to it. 
-So first is the first, the skip is the skip variable, and we also want to pass the order by, which is the created at descending just so that we can get our most recent values that are going to be coming in. 
-Now we'll go down to our actual query, where we have the all items query, and we'll pass some of those variables. 
-So it's a variables-- Variables that we are going to pass, and let's just say skip two, and first four. 
-We'll obviously come back. 
-Now when I refresh this-- Oh, bit of an error here. 
-Let's debug that. 
-Export default imported as per page was not found... 
-Oh, I see what I did. 
-When I imported that per page variable, it's not a-- If I see if I look at the config, you see that it's not a default export. 
-It's a named export so we need to import it as a named import. 
-So, does that work now? Awesome, so now we're getting four items actually in. 
-See, if I were to change this to skip zero, we get four different items. 
-If I were to only ask for the first one, you see we'll only get one item. 
-Then we could just manually change that skip value, and you'll see that we get a different item every single time. 
-So these are sort of the knobs that we're going to be turning, in order to actually figure out what we want to show. 
-So, how do we make these dynamic? Well, the skip value is going to be this.props.page times per page minus per page. 
-And what that will do is-- How many do we want to skip? Well if it's on page one, we want to skip four minus four, meaning we want to skip zero. 
-If it's on page two, two times four is eight, minus four is four! And that's going to give you the-- You're going to skip the first four, which would be for page one, and it's going to show you the next four, which is what we're going to put in here, which is going to be our per page variable. 
-Now refresh, and looks like our items are coming in. 
-I believe we could actually omit this first right here, because that is going to default-- There we go, yeah! We don't necessarily need to, we can just leave it out because it's going to fall back to the four that is in here. 
-There's no need to pass it right there. 
-Now, do all of our pages work? Looks like it's going! Big fan of that. 
-See how nice and snappy that is once-- Go on maybe on the first page, refresh it manually. 
-Now click on the second page; you see it's a slight little delay there while it loads, but then after that it's all instant. 
-And when you're in production, those are going to be pre-loaded, so that when I hit the first page, the next page is already going to be pre-loaded, so that when I click it, it's going to be that instant cut-over that we've really been looking for. 
+    - skip argument, which is going to be an integer, and we're going to default that to zero, and then we also want to take in a first argument, which is going to be an integer, and we're going to default that to the per page variable that we have imported from our settings. 
+
 Last thing I wanted to say is that, if I were to add a new item now... 
-Let me do that. 
-So, if I were to choose something in here, let's do the Canada goose. 
-Just say just added. 
-But if we go to the home page, it's nowhere to be found. 
-And why is that? Well, that's because the home page was already fetched once before. 
+But if we go to the home page, it's nowhere to be found. That's because the home page was already fetched once before. 
 And now the fact that the home page is updated, then that means page one is out of date. 
 Then that means page two is out of date, and that means page three is out of date! So, we get into this sort of, existential crisis where I don't really know where to... 
 How to actually handle this pagination, 'cause we need something else called cache invalidation, where we actually need to delete the page one and page two and page three pieces of the cache, because now they're all out of date. 
@@ -1985,13 +1897,14 @@ I wouldn't necessarily call it a bug, but it's a conundrum.
 It's something that we don't really know how to best solve, and because there is no way to delete part of the cache. 
 There is something that you can delete the entire cache, but that's not a good solution because if we have items in our cart, or we're signed in, or there's orders that we viewed-- Those would all go as well. 
 So, there currently is no solution for it. 
-And, they are planning to introduce something which would allow us to invalidate part of the cache without having to blow the entire cache away. 
-So, just sit on your hands for now because I will be updating it. 
-This is one of the things that kept me from actually recording this course, and there is no good way-- I'm not the only one with this problem, and we will be running-- We will be figuring out how to solve it in the future. 
-Alright, so with that said, we are all in good shape. 
-We have all of our caches, and everything working. 
-Our pagination is working beautiful,
-let's step into the next part of the course.
+
+
+ISSUE in terminal:
+[GraphQL error]: Message: Expected type ItemOrderByInput, found createdAt_DESC; Did you mean the enum value image_DESC or price_DESC?, Location: [object Object], Path: undefined
+Solution:
+- add  createdAt: DateTime! @createdAt under your type Item in the datamodel.graphql. 
+- (??) add createdAt_DESC under the enum ItemOrderByInput in the prisma.graphql file.  
+- re-deploy your changes to Prisma like so: prisma deploy --force --env -file variables.env
 
 
 ---------------------------------------------------------------------------------------------------------------
