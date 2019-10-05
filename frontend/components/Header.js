@@ -1,40 +1,20 @@
 import Link from 'next/link';
 import styled from 'styled-components';
-import Nav from './Nav';
-import Router from 'next/router';
 import NProgress from 'nprogress';
+import Router from 'next/router';
+import Nav from './Nav';
+import Cart from './Cart';
 
 Router.onRouteChangeStart = () => {
     NProgress.start();
-    // console.log('onRouteChangeStart Triggered');
 };
 Router.onRouteChangeComplete = () => {
     NProgress.done();
-    // console.log('onRouteChangeComplete Triggered');
-};
-Router.onRouteChangeError = () => {
-    NProgress.done();
-    // console.log('onRouteChangeError Triggered');
 };
 
-const StyledHeader = styled.header`
-    .bar {
-        border-bottom: 10px solid ${props => props.theme.black};
-        display: grid;
-        grid-template-columns: auto 1fr;
-        justify-content: space-between;
-        align-items: stretch;
-        @media (max-width: 1300px) {
-            grid-template-columns: 1fr;
-            justify-content: center;
-        }
-    }
-    .sub-bar {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        border-bottom: 1px solid ${props => props.theme.lightgrey};
-    }
-`;
+Router.onRouteChangeError = () => {
+    NProgress.done();
+};
 
 const Logo = styled.h1`
     font-size: 4rem;
@@ -55,24 +35,40 @@ const Logo = styled.h1`
     }
 `;
 
-const Header = props => {
-    // console.log('Header props', props);
-    return (
-        <StyledHeader>
-            <div className="bar">
-                <Logo>
-                    <Link href="/">
-                        <a>Sick Fits</a>
-                    </Link>
-                </Logo>
-                <Nav />
-            </div>
-            <div className="sub-bar">
-                <p>Search</p>
-            </div>
-            <div>Cart</div>
-        </StyledHeader>
-    );
-};
+const StyledHeader = styled.header`
+    .bar {
+        border-bottom: 10px solid ${props => props.theme.black};
+        display: grid;
+        grid-template-columns: auto 1fr;
+        justify-content: space-between;
+        align-items: stretch;
+        @media (max-width: 1300px) {
+            grid-template-columns: 1fr;
+            justify-content: center;
+        }
+    }
+    .sub-bar {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        border-bottom: 1px solid ${props => props.theme.lightgrey};
+    }
+`;
+
+const Header = () => (
+    <StyledHeader>
+        <div className="bar">
+            <Logo>
+                <Link href="/">
+                    <a>Sick Fits</a>
+                </Link>
+            </Logo>
+            <Nav />
+        </div>
+        <div className="sub-bar">
+            <p>Search</p>
+        </div>
+        <Cart />
+    </StyledHeader>
+);
 
 export default Header;

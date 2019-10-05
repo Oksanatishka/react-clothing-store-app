@@ -315,10 +315,23 @@ Create /pages/permissions.js
 ================ Module 6 - Shopping Cart (1h 29min)================ 
 ================ ================ ================ ================ 
 ================ #38 — Creating our cart in React (05:29)
+FRONTEND
+Create /components/Cart.js -> create Cart component.
+Open Header.js -> import Cart component, replace cart text with Cart component in Header component.
 
 ================ #39 — Apollo Local State Queries and Mutations (12:30)
+Open withData.js -> add local data 'clientState' under request.
+Open Cart.js -> add query, mutation,
+Make small changes in Nav.js
 
 ================ #40 — Server Side Add To Cart (17:04)
+BACKEND
+Open datamodel.graphql -> add type CartItem.    -> redeploy
+Open schema.graphql -> add mutation called addToCart. -> resolver part
+Create /components/AddToCart.js
+Open Item.js -> import AddToCart component, swap button 'add to cart' with a component AddToCart
+
+In browser click on Add to Cart button and check Inspector-> Network tab -> localhost requests.
 
 ================ #41 — Displaying Cart Items and Totals (20:00)
 
