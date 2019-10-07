@@ -347,8 +347,21 @@ In browser click on Add to Cart button and check Inspector-> Network tab -> loca
 ================ Module 7 - Advanced UI and Code Quality (38min)================ 
 ================ ================ ================ ================ 
 ================ #46 — Cleaning Up This Render Prop Mess (06:20)
+In Cart.js there are <User>, <Mutation> and <Query> components - it's mess - слишком большая вложенность.
+Solution:
+import { adopt } from 'react-adopt';    // for dealing with render prop mess
+// make new component called 'Composed'
+const Composed = adopt ({
+    user: <User/>,
+    toggleCart: <Mutation mutation={TOGGLE_CART_MUTATION},
+    localState: <Query query={LOCAL_STATE_QUERY},
+});
+// replace <User> with <Composed>
 
 ================ #47 — Search Dropdown Autocomplete (18:13)
+Use 'downshift' package (it's search with dropdown) released by Paypal https://github.com/downshift-js/downshift
+Create Search.js -> add a list of imports -> add 'AutoComplete' class -> add SEARCH_ITEMS_QUERY.
+In Header.js import our search.
 
 ================ #48 — Autocomplete with Downshift (13:08)
 
