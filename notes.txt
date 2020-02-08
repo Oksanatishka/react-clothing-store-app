@@ -26,7 +26,22 @@ Create index.js, sell.js under pages folder -> insert React class/function compo
     
 ================ #4 — Custom _app.js Layout (12:25)  
 FRONTEND
+
 Create /pages/_app.js (for some data to show up on each page - to override the App class). Check doc https://nextjs.org/docs#custom-app
+    import App, { Container } from 'next/app';
+    class myApp extends App {
+        render() {
+            const { Component } = this.props;
+
+            return (
+                <Container>
+                    <p>Hey, I'm on every page.</p>
+                    <Component />
+                </Container>
+            );
+        }
+    }
+    export default myApp;
 Create Page.js, Meta.js, Header.js, Nav.js  under components folder. Insert React Components.
     Page.js
     Meta.js (stateless component)
