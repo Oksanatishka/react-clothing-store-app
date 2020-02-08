@@ -18,7 +18,23 @@ between these pages.
 
 ================ #4 — Custom _app.js Layout (12:25)  
 FRONTEND
-Create _app.js(for some data to show up on each page - to override the App class) under pages folder.
+Create _app.js(for some data to show up on each page - to override the App class) under pages folder. Insert code:
+
+    import App, { Container } from 'next/app';
+    class myApp extends App {
+        render() {
+            const { Component } = this.props;
+
+            return (
+                <Container>
+                    <p>Hey, I'm on every page.</p>
+                    <Component />
+                </Container>
+            );
+        }
+    }
+    export default myApp;
+    
 Create Page.js, Meta.js, Header.js, Nav.js,  under components folder. Insert React Components.
 
 
