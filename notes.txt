@@ -1,5 +1,13 @@
 Fullstack Advanced React & GraphQL https://advancedreact.com/
 
+Time tracking
+#1 - 5min
+#3 - 5min
+#4 - 5min
+
+Imports:
+- import Link from 'next/link'      - Next.js's Link API
+
 ================ ================ ================ ================  ================ ================
 ================ Module 1 - Introduction and Setup (40min)================ 
 ================ ================ ================ ================ 
@@ -13,15 +21,57 @@ Fullstack Advanced React & GraphQL https://advancedreact.com/
 ================ #3 — An Intro to Next.js, Tooling and Routing (08:50)
 > cd frontend/
 > npm run dev       // open http://localhost:7777/ in browser
-Create index.js, sell.js under pages folder -> insert React class/function component, Routing with <Link> 
-between these pages.
-
+Create index.js, sell.js under pages folder -> insert React class/function component ->
+-> insert Routing with <Link> between these pages (check doc: https://nextjs.org/learn/basics/navigate-between-pages/using-link)
+    
 ================ #4 — Custom _app.js Layout (12:25)  
 FRONTEND
-Create _app.js(for some data to show up on each page - to override the App class) under pages folder.
-Create Page.js, Meta.js, Header.js, Nav.js,  under components folder. Insert React Components.
+Create /pages/_app.js (for some data to show up on each page - to override the App class). Check doc https://nextjs.org/docs#custom-app
+Create Page.js, Meta.js, Header.js, Nav.js  under components folder. Insert React Components.
+    Page.js
+    Meta.js (stateless component)
+        - import Head component
+        - insert the following code into component:
+            <Head>
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <meta charSet="utf-8" />
+                <link rel="shortcut icon" href="/static/favicon.png" />
+                <link rel="stylesheet" type="text/css" href="/static/nprogress.css" />
+                <title>Sick Fits!</title>
+            </Head>
+    Header.js (class component)
+        - import Nav component
+        - insert the following code into component:
+            <div className="bar">
+                <a href="">Sick Fits</a>
+                <Nav />
+            </div>
+            <div className="sub-bar">
+                <p>Search</p>
+            </div>
+            <div>Cart</div>
+    Nav.js (stateless component)
+        - import Link
+        - insert the following code into component:
+            <Link href="/sell">
+                <a>Sell!</a>
+            </Link>
+            <Link href="/">
+                <a>Home!</a>
+            </Link>
 
+------------ Some notes -------------
+Functional vs Class-Components in React:
+    - functional component is just a plain JavaScript function, you cannot use setState() in your component. That’s the reason why they also get called functional stateless components.
+    - you cannot use lifecycle hooks in functional components.
+    - Advantages of functional components:
+        - easier to read and test
+        - less code
 
+Snippets:        
+    rcc - class component skeleton
+    rsc - stateless component skeleton
+-------------------------------------
 ================ ================ ================ ================ ================ ================
 ================ Module 2 - CSS and Styled Components (51min) ================ 
 ================ ================ ================ ================ 
@@ -369,27 +419,88 @@ In Header.js import our search.
 ================ Module 8 - Credit Card Checkout (1h 19min)================ 
 ================ ================ ================ ================ 
 ================ #49 — Credit Card Processing with Stripe Checkout (16:45)
+We're going to be using a credit card processor called Stripe https://stripe.com/ -> sign up for an account -> 
+-> confirm through email -> activate 'Viewing test data' ->  Developers tab -> API keys -> see token ->
+copy 'Publishing key' -> 
+Create /components/TakeMyMoney.js -> add imports including 'import StripeCheckout from 'react-stripe-checkout' ->
+-> write TakeMyMoney class.
+import TakeMyMoney into Cart.js
+Check documentation for react stripe checkout https://github.com/azmenak/react-stripe-checkout
+Don't put your credit card for testing -> google 'stripe testing credit cards' https://stripe.com/docs/testing, expiring date can be anything, e.g. 02/22, CVC too, e.g. 222.
 
 ================ #50 — Charging Cards on the Server Side (17:50)
+Task: 1) Charge token on the server side, 2) convert cart items into order item(create type order). 
+In datamodel.graphql create a new type called OrderItem and Order.
+In schema.graphql add createOrder mutation.
+Create a resolver from that mutation in Mutation.js.
 
 ================ #51 — Saving Orders to the Database (13:14)
 
 ================ #52 — Displaying Single Orders (17:57)
+Create /pages/order.js
+Create /components/Order.js
+Open schema.graphql and add 'order' query -> write resolver for query in Query.js.
 
 ================ #53 — Orders Page (14:19)
+Create /pages/orders.js
+Create /components/OrderList.js
+Open schema.graphql and add 'orders' query -> write resolver for query in Query.js.
 
 ================ ================ ================ ================  ================ ================
 ================ Module 9 - Testing (3h 20min)================ 
 ================ ================ ================ ================ 
 ================ #54 — Testing with Jest and Enzyme Introduction (07:44)
+Tools:
+1) Jest https://jestjs.io/ - testing framework for js, test runner
+> npm run test
+Check expect methods: https://jestjs.io/docs/en/expect
+Open package.json -> find jest config.
+In jest.setup.js you'll find enzyme config.
+
+2) Enzyme https://airbnb.io/enzyme/ - to test React components via shallow render or by mounting it, React Test Renderer
 
 ================ #55 — Unit Testing 101 (16:30)
+/components
+    /Pagination
+        index.js
+        style.js
+        Pagination.js
+
+OR (we'll create __tests__ folder inside of frontend folder for simplisity)
+
+/components
+    /Pagination
+        __tests__/
+            whatever.test.js
+        index.js
+        style.js
+
+VS Code package (optionally)
+xit() - it.skip()
+fit() - focus - it.only()
+jest --watch - will monitor only files that was changed, it's won't check files from previous git commit.
+
+Create /__tests__/formatMoney.test.js
 
 ================ #56 — Mocking 101 (09:47)
+Create /__tests__/mocking.test.js
+mock function
+
 
 ================ #57 — First Tests and Shallow Rendering (14:38)
+Testing components.
+We're going to start with Item component because this Item component doesn't actually have any queries or mutations in it.
+It's actually just past in via props and then we display it. So we're going to 
+    - import this component into a test.
+    - render it on out.
+    - check that all these things are working as planned: check that the description is there and that the title is there,
+    and that the image is there, and that the price is being formatted properly,
+
+Create /__tests/item.test.js
+Check doc https://airbnb.io/enzyme/docs/api/ShallowWrapper/debug.html
 
 ================ #58 — Snapshot Testing (15:18)
+/__tests__/__snapshots__ folder will be created.
 
 ================ #59 — Testing and Mocking Apollo Queries (19:40)
 
@@ -408,3 +519,93 @@ In Header.js import our search.
 ================ ================ ================ ================  ================ ================
 ================ Module 10 - Deployment (28min)================ 
 ================ ================ ================ ================ 
+You get three different things to deploy:
+1) Prisma Server:
+    1. MySQL
+2) Yoga Server
+    Mutation and Query Resolvers
+3) React app 
+    next.js
+
+================ #66 — Deploying a Prisma Server to Heroku (06:49)
+Heroku will support frontend and backend of our application.
+Go to prisma dashboard -> Add a server(our case) / Create a hosted server -> Server name: 'sick-fits-production' ->
+-> Create a new database(our case) / Connect to an existing database -> Heroku -> sign in with your heroku account ->
+-> take free plan -> Set up a server -> Heroku -> choose free plan -> Prisma server was successfully deployed! -> View the server.
+-> you won't see a service for it because you need to deploy the app on the backend.
+
+Go to backend -> npm run deploy -- -n   -> questions in the terminal:
+- Set up a new Prisma server or deploy to an existing server? - wesbos/sick-fits-production
+- Choose a name for your service - sick-fits-prod
+- Choose a name for your stage - prod
+
+Go to prisma.yml -> uncomment secter and change endpoint.
+> npm run deploy
+
+================ #67 — Deploying Yoga Server to Heroku or Now (11:47)
+1) install the Heroku CLI https://devcenter.heroku.com/articles/heroku-cli
+> heroku --help
+> heroku login
+
+> git add -A
+> git commit -m 'all code'
+2) create a heroku application
+> heroku apps:create sickfits-yoga-prod     // you'll see your app on heroku dashboard
+Now, it will give you this git URL right here, by default it's going to get it listed as a remote.
+> git remote -v
+However, we're not actually going to be using the heroku remote because we need to just deploy sub-folders.
+So, what were gonna do is were gonna add some more remotes that are for heroku frontend and heroku backend.
+Go ahead and copy that git that you have right here or you can just copy it from typing git remote-v.
+> git remote add heroku-backend https://git.heroku.com/sickfits-yoga-prod.git
+> git subtree -- prefix backend heroku-backend master
+
+In production we'll be running 'npm run start'
+
+> heroku logs --tail
+
+Go to your heroku backend -> sickfits-yoga-prod -> Settings -> click on 'Reveal config vars' -> 
+-> copy, paste all of .env values in here.
+
+Again:
+> git add -A
+> git commit -m 'all code'
+> git subtree -- prefix backend heroku-backend master
+
+How to deploy on Now platform.
+sign up
+> npm i now -g
+> cd backend    
+> now       // it'll automatically give you a URL
+Check doc to deal with .env https://zeit.co/docs/v1/features/env-and-secrets
+
+================ #68 — Deploying Frontend to Heroku and Now (09:43)
+In config.js add a row:   export const prodEndpoint = `https://sickfits-yoga-prod.herokuapp.com/`;
+In withData.js import prodEndpoint and change 
+    from    'development' ? endpoint : endpoint
+    to      'development' ? endpoint : prodEndpoint
+
+Go to main folder
+> git remote -v
+> heroku apps:create sickfits-next-prod     //It's going to create a new git repo for us
+> git remote add heroku-frontend https://git.heroku.com/sickfits-next-prod.git
+> git remote -v
+> git add -A
+> git commit -m 'prod url'
+> npm run build     // that's going to create .next folder for us. And that's where the actual build of our application is getting dumped into.
+                    The problem with that is that, you don't want to put this .next on a git repo because it's just a bundled version,
+                    it's a compiled version of it but because heroku uses git to push it, we're in sort of a pickle where I don't want this part
+                    of my report but I do want to push it to heroku. So what we're gonna do is we're gonna add a little hook
+                    for heroku that is going to actually build this for us but on their server.
+add a new script in package.json called "heroku-postbuild": "next build"
+modify start script from "start": "next start"      to      "start": "next start -p $PORT" 
+> git add -A
+> git commit -m 'postbuild'
+make sure you're in the main folder not the frontend folder.
+> git subtree push -- prefix frontend heroku-frontend master
+
+Open https://sickfits-next-prod.herokuapp.com in browser -> open Console -> see errors.
+> it's because our current front-end URL set to localhost 777 in heroku settings -> change it there.
+Now when you do change this, you do need to reboot your server-side.
+Click on 'More' -> 'Restart all dynos'
+
+In Now it's the same process as in backend above(just cd frontend).
